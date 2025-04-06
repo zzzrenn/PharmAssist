@@ -201,6 +201,9 @@ class NiceCrawler(BaseAbstractCrawler):
                 
                 result_data["chapters"].append(chapter_data)
         
+        # Close the driver
+        self.driver.close()
+
         # Handle database update/create
         if existing_doc:
             # Update existing document
