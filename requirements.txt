@@ -4,3 +4,4 @@ pymongo
 structlog
 pydantic
 pydantic-settings
+aws-lambda-powertools
