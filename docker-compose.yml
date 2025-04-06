@@ -1,0 +1,12 @@
+services:
+  data-crawlers:
+    image: "pharmassist-data-crawlers"
+    container_name: pharmassist-data-crawlers
+    platform: "linux/amd64"
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.data_crawlers
+    env_file:
+      - .env
+    ports:
+      - "9010:8080"
