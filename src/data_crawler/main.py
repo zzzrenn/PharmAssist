@@ -8,5 +8,5 @@ from crawlers import NiceCrawler
 
 if __name__ == "__main__":
     crawler = NiceCrawler()
-    url = "https://www.nice.org.uk/search?q=Hypertension&ndt=Guidance&gst=Published"
+    url = "https://www.nice.org.uk/guidance/ng133"
     crawler.extract(url)

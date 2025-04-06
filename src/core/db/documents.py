@@ -41,11 +41,19 @@ class BaseDocument(BaseModel):
 
         return parsed
 
-    def save(self, **kwargs):
+    def save(self, existing_doc=False, **kwargs):
         collection = _database[self._get_collection_name()]
 
         try:
-            result = collection.insert_one(self.to_mongo(**kwargs))
+            if existing_doc:
+                result = collection.update_one(
+                    {"_id": str(self.id)},
+                    {"$set": self.to_mongo(**kwargs)},
+                    upsert=False
+                )
+                return result.upserted_id
+            else:
+                result = collection.insert_one(self.to_mongo(**kwargs))
             return result.inserted_id
         except errors.WriteError:
             logger.exception("Failed to insert document.")
@@ -107,7 +115,7 @@ class BaseDocument(BaseModel):
 class NiceDocument(BaseDocument):
     title: str
     url: str
-    summary: str
+    last_updated: str
     chapters: List[dict]
 
     class Settings:
