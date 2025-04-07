@@ -18,9 +18,9 @@ local-test-nice: # Make a call to your local AWS Lambda (hosted in Docker) to cr
 
 local-ingest-data: # Ingest all links from data/links.txt by calling your local AWS Lambda hosted in Docker.
 	while IFS= read -r link; do \
+		link=`echo "$$link" | tr -d '\r'`; \
 		echo "Processing: $$link"; \
 		curl -X POST "http://localhost:9010/2015-03-31/functions/function/invocations" \
 			-d "{\"link\": \"$$link\"}"; \
 		echo "\n"; \
-		sleep 2; \
 	done < data/links.txt
