@@ -42,6 +42,10 @@ class NiceCrawler(BaseAbstractCrawler):
             # Document exists - check if it needs updating
             if existing_doc.last_updated == last_updated:
                 print(f"Document already exists and is up to date: {title}")
+
+                # Close the driver
+                self.driver.close()
+
                 return  # Skip processing
             else:
                 print(f"Document exists but needs updating (last_updated changed from {existing_doc.last_updated} to {last_updated})")
