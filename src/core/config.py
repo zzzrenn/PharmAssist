@@ -2,7 +2,7 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT_DIR = str(Path(__file__).parent.parent.parent/".env")
+ROOT_DIR = str(Path(__file__).parent.parent.parent)
 
 
 class AppSettings(BaseSettings):
@@ -57,10 +57,10 @@ class AppSettings(BaseSettings):
     EMBEDDING_SIZE: int = 384
     EMBEDDING_MODEL_DEVICE: str = "cpu"
 
-    def patch_localhost(self) -> None:
-        self.MONGO_DATABASE_HOST = "mongodb://localhost:30001,localhost:30002,localhost:30003/?replicaSet=my-replica-set"
-        self.QDRANT_DATABASE_HOST = "localhost"
-        self.RABBITMQ_HOST = "localhost"
+    # def patch_localhost(self) -> None:
+    #     self.MONGO_DATABASE_HOST = "mongodb://localhost:30001,localhost:30002,localhost:30003/?replicaSet=my-replica-set"
+    #     self.QDRANT_DATABASE_HOST = "localhost"
+    #     self.RABBITMQ_HOST = "localhost"
 
 
 settings = AppSettings()
