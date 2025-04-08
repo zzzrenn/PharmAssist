@@ -5,6 +5,7 @@ from tempfile import mkdtemp
 from core.db.documents import BaseDocument
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 class BaseAbstractCrawler(ABC):
     model: type[BaseDocument]
@@ -14,23 +15,24 @@ class BaseAbstractCrawler(ABC):
 
         options = webdriver.ChromeOptions()
 
-        options.add_argument("--no-sandbox")
         options.add_argument("--headless=new")
+        options.add_argument('--no-sandbox')
+        options.add_argument("--disable-gpu")
+        options.add_argument("--window-size=1280x1696")
+        options.add_argument("--single-process")
         options.add_argument("--disable-dev-shm-usage")
-        options.add_argument("--log-level=3")
-        options.add_argument("--disable-popup-blocking")
-        options.add_argument("--disable-notifications")
-        options.add_argument("--disable-extensions")
-        options.add_argument("--disable-background-networking")
-        options.add_argument("--ignore-certificate-errors")
+        options.add_argument("--disable-dev-tools")
+        options.add_argument("--no-zygote")
         options.add_argument(f"--user-data-dir={mkdtemp()}")
         options.add_argument(f"--data-path={mkdtemp()}")
         options.add_argument(f"--disk-cache-dir={mkdtemp()}")
-        options.add_argument("--remote-debugging-port=9226")
+        options.add_argument("--remote-debugging-port=9222")
+        options.binary_location = "/opt/chrome/chrome"
 
         self.set_extra_driver_options(options)
 
         self.driver = webdriver.Chrome(
+            service=Service(executable_path='/opt/chromedriver'),
             options=options,
         )
 
