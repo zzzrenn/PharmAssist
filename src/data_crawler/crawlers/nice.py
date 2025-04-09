@@ -23,6 +23,7 @@ class NiceCrawler(BaseAbstractCrawler):
             title = title_element.text.strip() if title_element else "Unknown Title"
             
             # Extract last updated date
+            published_date = None
             last_updated = None
             metadata = soup.find("ul", class_="page-header__metadata")
             if metadata:
@@ -36,7 +37,16 @@ class NiceCrawler(BaseAbstractCrawler):
                         else:
                             # If no datetime attribute, extract the text
                             last_updated = li.text.replace("Last updated:", "").strip()
-                        break
+                        
+                    if "Published" in li.text:
+                        # Extract the datetime from the time element
+                        time_element = li.find("time")
+                        if time_element and time_element.has_attr("datetime"):
+                            published_date = time_element["datetime"]
+                        else:
+                            # If no datetime attribute, extract the text
+                            published_date = li.text.replace("Published:", "").strip()
+                        
             
             # Check if document already exists and if it needs updating
             if existing_doc:
@@ -51,7 +61,12 @@ class NiceCrawler(BaseAbstractCrawler):
                 print(f"New document found: {title}")
             
             # Store basic info
-            result_data = {"title": title, "url": link, "last_updated": last_updated, "chapters": []}
+            result_data = {
+                "title": title, 
+                "url": link, 
+                "last_updated": last_updated if last_updated else published_date, 
+                "chapters": []
+                }
             
             # Extract chapters navigation
             detail_soup = BeautifulSoup(self.driver.page_source, "html.parser")
@@ -220,6 +235,9 @@ class NiceCrawler(BaseAbstractCrawler):
                 )
                 instance.save()
                 print(f"Added new document: {title}")
+        except Exception as e:
+            print(f"Error during extraction: {e}")
+            raise e
         finally:
             # Always close the driver, even if there's an error or timeout
             try:
