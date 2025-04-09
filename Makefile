@@ -14,13 +14,13 @@ local-stop: # Stop your local Docker infrastructure.
 
 local-test-nice: # Make a call to your local AWS Lambda (hosted in Docker) to crawl a NICE guideline.
 	curl -X POST "http://localhost:9010/2015-03-31/functions/function/invocations" \
-	  	-d "{\"link\": \"https://www.nice.org.uk/guidance/ng133\"}"
+	  	-d "{\"Records\": [{\"body\": \"https://www.nice.org.uk/guidance/ng106\"}]}"
 
 local-ingest-data: # Ingest all links from data/links.txt by calling your local AWS Lambda hosted in Docker.
 	while IFS= read -r link; do \
 		link=`echo "$$link" | tr -d '\r'`; \
 		echo "Processing: $$link"; \
 		curl -X POST "http://localhost:9010/2015-03-31/functions/function/invocations" \
-			-d "{\"link\": \"$$link\"}"; \
+			-d "{\"Records\": [{\"body\": \"$$link\"}]}"; \
 		echo "\n"; \
 	done < data/links.txt

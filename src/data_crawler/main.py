@@ -17,22 +17,25 @@ _dispatcher.register("nice", NiceCrawler)
 
 
 def handler(event, context: LambdaContext | None = None) -> dict[str, Any]:
-    link = event.get("link")
-    crawler = _dispatcher.get_crawler(link)
+    for record in event.get("Records", []):
+        link = record.get("body")
+        crawler = _dispatcher.get_crawler(link)
 
-    try:
-        crawler.extract(link=link)
+        try:
+            crawler.extract(link=link)
+        except Exception as e:
+            return {"statusCode": 500, "body": f"An error occurred: {str(e)}"}
+    return {"statusCode": 200, "body": "Link processed successfully"}
 
-        return {"statusCode": 200, "body": "Link processed successfully"}
-    except Exception as e:
-        return {"statusCode": 500, "body": f"An error occurred: {str(e)}"}
 
 
 if __name__ == "__main__":
-    url = "https://www.nice.org.uk/guidance/ng133"
+    url = "https://www.nice.org.uk/guidance/ng106"
 
     event = {
-        "link": url,
+        "Records": [
+            {"body": url}
+        ]
     }
     handler(event, None)
 
