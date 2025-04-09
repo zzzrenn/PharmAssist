@@ -10,3 +10,25 @@ services:
       - .env
     ports:
       - "9010:8080"
+
+  mq:
+    image: rabbitmq:3-management-alpine
+    container_name: pharmassist-mq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    volumes:
+      - ./rabbitmq/data/:/var/lib/rabbitmq/
+      - ./rabbitmq/log/:/var/log/rabbitmq
+    restart: always
+
+  data_cdc:
+    image: "pharmassist-data-cdc"
+    container_name: pharmassist-data-cdc
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.data_cdc
+    env_file:
+      - .env
+    depends_on:
+      - mq
