@@ -46,7 +46,8 @@ class NiceCrawler(BaseAbstractCrawler):
                         else:
                             # If no datetime attribute, extract the text
                             published_date = li.text.replace("Published:", "").strip()
-                        
+            if last_updated is None:
+                last_updated = published_date
             
             # Check if document already exists and if it needs updating
             if existing_doc:
@@ -64,7 +65,7 @@ class NiceCrawler(BaseAbstractCrawler):
             result_data = {
                 "title": title, 
                 "url": link, 
-                "last_updated": last_updated if last_updated else published_date, 
+                "last_updated": last_updated, 
                 "chapters": []
                 }
             
