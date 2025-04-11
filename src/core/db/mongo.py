@@ -17,7 +17,7 @@ class MongoDatabaseConnector:
             try:
                 cls._instance = MongoClient(settings.MONGO_DATABASE_HOST)
                 logger.info(
-                    f"Connection to database with uri: {settings.MONGO_DATABASE_HOST} successful"
+                    f"Connection to MongoDB database successful"
                 )
             except ConnectionFailure:
                 logger.error(f"Couldn't connect to the database.")
