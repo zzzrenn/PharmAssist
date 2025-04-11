@@ -42,7 +42,7 @@ PharmAssist is a RAG-based chatbot for pharmacist guidelines. It has a distribut
 - Create a SQS
 - Create a lambda that reads the links.txt from this bucket and send message to SQS. Copy aws/link_processor.py to the created lambda. Add the required environment variables.
 - Push the pharmassist-data-crawler image to ECR. Create a lambda using this image. Add the environment variable MONGO_DATABASE_HOST. Set the memory to 512 MB and timeout to 5 minutes. Add the SQS as trigger.
-- Finally, create a EventBridge Scheduler to create a cron job that trigger the process the links in the text file.
+- Finally, create a EventBridge Scheduler to create a cron job that triggers the lambda to process the links in the text file.
 
 ## Reference
 
