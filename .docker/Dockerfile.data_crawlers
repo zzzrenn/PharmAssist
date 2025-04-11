@@ -18,7 +18,7 @@ COPY --from=build /opt/chrome-linux64 /opt/chrome
 COPY --from=build /opt/chromedriver-linux64 /opt/
 
 # Install dependencies
-COPY ./requirements.txt ${LAMBDA_TASK_ROOT}/requirements.txt
+COPY ./src/data_crawler/requirements.txt ${LAMBDA_TASK_ROOT}/requirements.txt
 RUN python -m pip install --upgrade pip && pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt --target ${LAMBDA_TASK_ROOT}
 
 # Set PYTHONPATH to include the src directory for proper imports
