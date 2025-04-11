@@ -1,0 +1,45 @@
+# Use an official Python runtime as a parent image
+FROM python:3.11-slim-bullseye
+
+ENV WORKSPACE_ROOT=/usr/src/app \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 
+
+RUN mkdir -p $WORKSPACE_ROOT
+
+# Install system dependencies
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends build-essential \
+    gcc \
+    python3-dev \
+    curl \
+    build-essential \
+    && apt-get clean
+
+# Get Rust
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+
+# Add Rust to PATH
+ENV PATH="/root/.cargo/bin:$PATH"
+
+# Copy the requirements.txt file
+COPY ./src/feature_pipeline/requirements.txt .   
+
+# Install dependencies
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# Set the working directory
+WORKDIR $WORKSPACE_ROOT
+
+# Copy the feature pipeline and any other necessary directories
+COPY ./src/feature_pipeline .
+COPY ./src/core ./core
+
+# Set the PYTHONPATH environment variable
+ENV PYTHONPATH=/usr/src/app
+
+RUN chmod +x /usr/src/app/scripts/bytewax_entrypoint.sh
+
+# Command to run the Bytewax pipeline script
+CMD ["/usr/src/app/scripts/bytewax_entrypoint.sh"]
