@@ -31,7 +31,7 @@ class AppSettings(BaseSettings):
     EMBEDDING_MODEL_ID: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_MODEL_MAX_INPUT_LENGTH: int = 512
     EMBEDDING_SIZE: int = 384
-    EMBEDDING_MODEL_DEVICE: str = "cuda:0"
+    EMBEDDING_MODEL_DEVICE: str = "cpu"
 
     # RAG config
     ENABLE_SELF_QUERY: bool = False
