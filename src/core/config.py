@@ -18,7 +18,7 @@ class AppSettings(BaseSettings):
     RABBITMQ_DEFAULT_USERNAME: str = "guest"
     RABBITMQ_DEFAULT_PASSWORD: str = "guest"
     RABBITMQ_HOST: str = "mq"
-    RABBITMQ_PORT: int = 5673
+    RABBITMQ_PORT: int = 5672
 
     # QdrantDB config
     QDRANT_CLOUD_URL: str = "https://c8820847-221d-42b6-9a77-75afc147c89b.eu-central-1-0.aws.cloud.qdrant.io"
@@ -31,5 +31,22 @@ class AppSettings(BaseSettings):
     EMBEDDING_MODEL_ID: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_MODEL_MAX_INPUT_LENGTH: int = 512
     EMBEDDING_SIZE: int = 384
-    EMBEDDING_MODEL_DEVICE: str = "cpu"
+    EMBEDDING_MODEL_DEVICE: str = "cuda:0"
+
+    # RAG config
+    ENABLE_SELF_QUERY: bool = False
+    ENABLE_RERANKING: bool = False
+
+    # OpenAI config
+    OPENAI_MODEL_ID: str = "gpt-4o-mini"
+    OPENAI_API_KEY: str
+
+    # CometML config
+    COMET_API_KEY: str
+    COMET_WORKSPACE: str
+    COMET_PROJECT: str = "pharmassist"
+
+    # OPIK config
+    OPIK_API_KEY: str
+
 settings = AppSettings()
