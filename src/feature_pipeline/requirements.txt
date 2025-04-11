@@ -1,10 +1,7 @@
-beautifulsoup4
-selenium
 pymongo
 structlog
 pydantic
 pydantic-settings
-aws-lambda-powertools
 
 pika
 

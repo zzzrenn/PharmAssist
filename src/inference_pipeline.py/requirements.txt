@@ -1,12 +1,6 @@
-beautifulsoup4
-selenium
-pymongo
 structlog
 pydantic
 pydantic-settings
-aws-lambda-powertools
-
-pika
 
 qdrant-client
 bytewax
@@ -15,3 +9,7 @@ numpy
 langchain
 sentence-transformers
 InstructorEmbedding
+
+opik
+langchain-openai
+comet-ml
