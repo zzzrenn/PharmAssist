@@ -36,6 +36,9 @@ class AppSettings(BaseSettings):
     # RAG config
     ENABLE_SELF_QUERY: bool = False
     ENABLE_RERANKING: bool = False
+    TOP_K: int = 5
+    KEEP_TOP_K: int = 5
+    EXPAND_N_QUERY: int = 5
 
     # OpenAI config
     OPENAI_MODEL_ID: str = "gpt-4o-mini"
@@ -51,5 +54,12 @@ class AppSettings(BaseSettings):
 
     # HuggingFace config
     HUGGINGFACE_ACCESS_TOKEN: str
+
+    # Model config
+    MODEL_ID: str = "Qwen/Qwen2.5-1.5B-Instruct"
+    MAX_INPUT_TOKENS: int = 1024  # Max length of input text.
+    MAX_TOTAL_TOKENS: int = 2048  # Max length of the generation (including input text).
+    MAX_BATCH_TOTAL_TOKENS: int = 2048  # Limits the number of tokens that can be processed in parallel during the generation.
+
 
 settings = AppSettings()
