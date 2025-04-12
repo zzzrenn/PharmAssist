@@ -1,5 +1,7 @@
-# Use an official Python runtime as a parent image
-FROM python:3.11-slim-bullseye
+FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
+# Install python 3.11 and set it as the default python version.
+RUN apt update && apt install -y python3.11 python3-pip
+RUN update-alternatives --install /usr/bin/python3 python /usr/bin/python3.11 1
 
 ENV WORKSPACE_ROOT=/usr/src/app \
     PYTHONDONTWRITEBYTECODE=1 \

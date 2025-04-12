@@ -1,11 +1,10 @@
 structlog
+pymongo
 pydantic
 pydantic-settings
 
 qdrant-client
-bytewax
 unstructured
-numpy
 langchain
 sentence-transformers
 InstructorEmbedding
