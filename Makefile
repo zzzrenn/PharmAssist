@@ -24,3 +24,10 @@ local-ingest-data: # Ingest all links from data/links.txt by calling your local 
 			-d "{\"Records\": [{\"body\": \"$$link\"}]}"; \
 		echo "\n"; \
 	done < data/links.txt
+
+# ======================================
+# ---------- Feature Pipeline ---------
+# ======================================
+
+local-test-retriever: # Test the retriever.
+	docker compose up feature_pipeline
