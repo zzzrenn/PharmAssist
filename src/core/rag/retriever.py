@@ -12,6 +12,7 @@ from core.rag.query_expansion import QueryExpansion
 from core.rag.reranking import Reranker
 from core.rag.self_query import SelfQuery
 
+import torch
 logger = logger_utils.get_logger(__name__)
 
 
@@ -23,7 +24,13 @@ class VectorRetriever:
     def __init__(self, query: str) -> None:
         self._client = QdrantDatabaseConnector()
         self.query = query
-        self._embedder = SentenceTransformer(settings.EMBEDDING_MODEL_ID)
+        device = settings.EMBEDDING_MODEL_DEVICE
+        if device.startswith("cuda") and not torch.cuda.is_available():
+            device = "cpu"
+            logger.warning("CUDA device requested but not available. Falling back to CPU.")
+        else:
+            logger.info("Using CUDA device for embeddings.")
+        self._embedder = SentenceTransformer(settings.EMBEDDING_MODEL_ID, device=device)
         self._query_expander = QueryExpansion()
         self._metadata_extractor = SelfQuery() if settings.ENABLE_SELF_QUERY else None
         self._reranker = Reranker() if settings.ENABLE_RERANKING else None
