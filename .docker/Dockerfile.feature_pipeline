@@ -43,5 +43,8 @@ ENV PYTHONPATH=/usr/src/app
 
 RUN chmod +x /usr/src/app/scripts/bytewax_entrypoint.sh
 
+# Fix windows line endings
+RUN sed -i -e 's/\r$//' /usr/src/app/scripts/bytewax_entrypoint.sh
+
 # Command to run the Bytewax pipeline script
 CMD ["/usr/src/app/scripts/bytewax_entrypoint.sh"]
