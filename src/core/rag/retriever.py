@@ -36,7 +36,7 @@ class VectorRetriever:
         self._reranker = Reranker() if settings.ENABLE_RERANKING else None
 
     def _search_single_query(self, generated_query: str, author_id: str, k: int):
-        assert k > 3, "k should be greater than 3"
+        assert k > 1, "k should be greater than 1"
 
         query_vector = self._embedder.encode(generated_query).tolist()
 
@@ -56,7 +56,7 @@ class VectorRetriever:
                     else None
                 ),
                 query_vector=query_vector,
-                limit=k // 3,
+                limit=k,
             )
         ]
 
