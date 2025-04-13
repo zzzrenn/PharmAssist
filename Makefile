@@ -3,7 +3,7 @@
 # ======================================
 
 local-start: # Build and start your local Docker infrastructure.
-	docker compose -f docker-compose.yml up --build -d
+	docker compose -f docker-compose.yml up --build
 
 local-stop: # Stop your local Docker infrastructure.
 	docker compose -f docker-compose.yml down --remove-orphans
@@ -29,5 +29,5 @@ local-ingest-data: # Ingest all links from data/links.txt by calling your local 
 # ---------- Feature Pipeline ---------
 # ======================================
 
-local-test-retriever: # Test the retriever.
-	docker compose up feature_pipeline
+local-test-inference-pipeline: # Test the inference pipeline.
+	docker compose -f docker-compose-inference.yml up --build

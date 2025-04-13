@@ -70,18 +70,18 @@ services:
               count: 1
               capabilities: [gpu]
 
-  inference_pipeline:
-    image: "pharmassist-inference-pipeline"
-    container_name: pharmassist-inference-pipeline
-    build:
-      context: .
-      dockerfile: .docker/Dockerfile.inference_pipeline
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    env_file:
-      - .env
+  # inference_pipeline:
+  #   image: "pharmassist-inference-pipeline"
+  #   container_name: pharmassist-inference-pipeline
+  #   build:
+  #     context: .
+  #     dockerfile: .docker/Dockerfile.inference_pipeline
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   env_file:
+  #     - .env
