@@ -1,0 +1,45 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+    -   id: trailing-whitespace
+        description: Removes trailing whitespace
+    -   id: end-of-file-fixer
+        description: Ensures files end with a newline
+    -   id: check-yaml
+        description: Checks yaml files for parseable syntax
+    -   id: check-json
+        description: Checks json files for parseable syntax
+    -   id: check-added-large-files
+        description: Prevents giant files from being committed
+        args: ['--maxkb=500']
+    -   id: debug-statements
+        description: Checks for debugger imports and py37+ `breakpoint()` calls
+    -   id: check-merge-conflict
+        description: Checks for files containing merge conflict strings
+
+-   repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+    -   id: black
+        description: The uncompromising Python code formatter
+        language_version: python3
+
+-   repo: https://github.com/PyCQA/isort
+    rev: 6.0.1
+    hooks:
+    -   id: isort
+        description: Sort Python imports
+        args: ["--profile", "black"]
+
+-   repo: https://github.com/PyCQA/flake8
+    rev: 7.2.0
+    hooks:
+    -   id: flake8
+        description: Python style guide enforcer
+        additional_dependencies: [
+            'flake8-bugbear',
+            # 'flake8-docstrings'
+            ]
+        args: ["--ignore", "B001,B027,E203,E401,E402,E501,E704,E722,F841,W503"]
+        exclude: ^.*\/__init__\.py$
