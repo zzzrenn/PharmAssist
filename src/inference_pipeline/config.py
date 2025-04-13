@@ -56,6 +56,7 @@ class AppSettings(BaseSettings):
     HUGGINGFACE_ACCESS_TOKEN: str
 
     # Model config
+    MODEL_DEVICE: str = "cuda"
     MODEL_ID: str = "Qwen/Qwen2.5-1.5B-Instruct"
     MAX_INPUT_TOKENS: int = 1024  # Max length of input text.
     MAX_TOTAL_TOKENS: int = 2048  # Max length of the generation (including input text).

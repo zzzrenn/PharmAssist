@@ -28,12 +28,38 @@ class Chatbot:
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
             
-            # Load model with CPU device
+            device = settings.MODEL_DEVICE
+            if device.startswith("cuda") and not torch.cuda.is_available():
+                device = "cpu"
+                logger.warning("CUDA device requested but not available. Falling back to CPU.")
+            else:
+                logger.info("Using CUDA device for LLM.")
+
+            # Configure bitsandbytes quantization only for CUDA
+            if device.startswith("cuda"):
+                quantization_config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_compute_dtype=torch.bfloat16,
+                    bnb_4bit_use_double_quant=True
+                )
+                model_kwargs = {
+                    "quantization_config": quantization_config,
+                    "device_map": device,
+                    "trust_remote_code": True
+                }
+                logger.info("Using bitsandbytes quantization for LLM.")
+            else:
+                model_kwargs = {
+                    "device_map": device,
+                    "trust_remote_code": True,
+                    "torch_dtype": torch.float32
+                }
+
+            # Load model
             self.model = AutoModelForCausalLM.from_pretrained(
                 settings.MODEL_ID,
-                device_map="cpu",  # Force CPU usage
-                trust_remote_code=True,
-                torch_dtype=torch.float32  # Use float32 for CPU
+                **model_kwargs
             )
             self.model.eval()  # Set to evaluation mode
         self.prompt_template_builder = InferenceTemplate()
@@ -133,6 +159,10 @@ class Chatbot:
             truncation=True,
             max_length=settings.MAX_INPUT_TOKENS
         )
+        
+        # Move input tensors to the same device as the model
+        device = next(self.model.parameters()).device
+        inputs = {k: v.to(device) for k, v in inputs.items()}
         
         # Generate response
         with torch.no_grad():

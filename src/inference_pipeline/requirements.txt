@@ -12,3 +12,5 @@ InstructorEmbedding
 opik
 langchain-openai
 comet-ml
+accelerate
+bitsandbytes

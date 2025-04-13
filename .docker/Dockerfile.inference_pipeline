@@ -1,6 +1,6 @@
 FROM nvidia/cuda:12.4.0-runtime-ubuntu22.04
 # Install python 3.11 and set it as the default python version.
-RUN apt update && apt install -y python3.11 python3-pip
+RUN apt update && apt install -y python3.11 python3.11-dev python3-pip
 RUN update-alternatives --install /usr/bin/python3 python /usr/bin/python3.11 1
 
 # Set the PYTHONPATH environment variable
@@ -15,4 +15,4 @@ COPY ./src/core ./core
 COPY ./src/inference_pipeline .
 
 # Command to run the inference pipeline script
-CMD ["python3", "test_retriever.py"]
+CMD ["python3", "main.py"]
