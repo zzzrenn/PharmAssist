@@ -1,13 +1,15 @@
-import sys
 import os
+import sys
+
 # Add the project root to path to resolve module imports
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 import json
 import logging
 
 from bson import json_util
 from config import settings
+
 from core.db.mongo import MongoDatabaseConnector
 from core.logger_utils import get_logger
 from core.mq import publish_to_rabbitmq
@@ -22,10 +24,12 @@ def stream_process():
         logging.info("Connected to MongoDB.")
 
         # Watch changes in a specific collection
-        changes = db.watch([{"$match": {"operationType": {"$in": ["insert", "update"]}}}])
+        changes = db.watch(
+            [{"$match": {"operationType": {"$in": ["insert", "update"]}}}]
+        )
         for change in changes:
             data_type = change["ns"]["coll"]
-            
+
             # Handle different operation types
             if change["operationType"] == "insert":
                 entry_id = str(change["fullDocument"]["_id"])
@@ -35,7 +39,9 @@ def stream_process():
                 # For updates, we need to fetch the full document
                 document = db[data_type].find_one({"_id": change["documentKey"]["_id"]})
                 if not document:
-                    logger.warning(f"Document with id {entry_id} not found after update")
+                    logger.warning(
+                        f"Document with id {entry_id} not found after update"
+                    )
                     continue
             else:
                 logger.warning(f"Unsupported operation type: {change['operationType']}")

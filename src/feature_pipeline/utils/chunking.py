@@ -1,9 +1,8 @@
+from config import settings
 from langchain.text_splitter import (
     RecursiveCharacterTextSplitter,
     SentenceTransformersTokenTextSplitter,
 )
-
-from config import settings
 
 
 def chunk_text(text: str) -> list[str]:

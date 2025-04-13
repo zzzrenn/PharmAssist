@@ -1,10 +1,10 @@
 import opik
-from core.config import settings
 from langchain_openai import ChatOpenAI
 from opik.integrations.langchain import OpikTracer
 
 import core.logger_utils as logger_utils
 from core import lib
+from core.config import settings
 from core.db.documents import NiceDocument
 from core.rag.prompt_templates import SelfQueryTemplate
 
@@ -34,12 +34,12 @@ class SelfQuery:
             return None
 
         logger.info(
-            f"Successfully extracted the user full name from the query.",
+            "Successfully extracted the user full name from the query.",
             user_full_name=user_full_name,
         )
         first_name, last_name = lib.split_user_full_name(user_full_name)
         logger.info(
-            f"Successfully extracted the user first and last name from the query.",
+            "Successfully extracted the user first and last name from the query.",
             first_name=first_name,
             last_name=last_name,
         )

@@ -12,7 +12,7 @@ PharmAssist is a RAG-based chatbot for pharmacist guidelines. It has a distribut
   - Data collection and normalization
 
 ### 2. Message Queue (RabbitMQ)
-- **Ports**: 
+- **Ports**:
   - AMQP: 5673
   - Management UI: 15673
 - **Description**: Central message broker for communication between changes in MongoDB and QdrantDB.

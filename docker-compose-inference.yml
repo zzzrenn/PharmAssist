@@ -1,5 +1,5 @@
 services:
-  
+
   inference_pipeline:
     image: "pharmassist-inference-pipeline"
     container_name: pharmassist-inference-pipeline

@@ -11,7 +11,7 @@ class AppSettings(BaseSettings):
     # MongoDB configs
     # MONGODB_USERNAME: str
     # MONGODB_PASSWORD: str
-    MONGO_DATABASE_HOST: str 
+    MONGO_DATABASE_HOST: str
     MONGO_DATABASE_NAME: str = "pharmassist"
 
     # MQ config
@@ -21,11 +21,15 @@ class AppSettings(BaseSettings):
     RABBITMQ_PORT: int = 5672
 
     # QdrantDB config
-    QDRANT_CLOUD_URL: str = "https://c8820847-221d-42b6-9a77-75afc147c89b.eu-central-1-0.aws.cloud.qdrant.io"
+    QDRANT_CLOUD_URL: str = (
+        "https://c8820847-221d-42b6-9a77-75afc147c89b.eu-central-1-0.aws.cloud.qdrant.io"
+    )
     QDRANT_DATABASE_HOST: str = "qdrant"
     QDRANT_DATABASE_PORT: int = 6333
     USE_QDRANT_CLOUD: bool = True
-    QDRANT_APIKEY: str | None = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.DEOG7SVnS9BJ6Aar4E7847jPnWLLL108O6jGnaoptDg"
+    QDRANT_APIKEY: str | None = (
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.DEOG7SVnS9BJ6Aar4E7847jPnWLLL108O6jGnaoptDg"
+    )
 
     # Embeddings config
     EMBEDDING_MODEL_ID: str = "BAAI/bge-small-en-v1.5"
@@ -51,5 +55,6 @@ class AppSettings(BaseSettings):
 
     # HuggingFace config
     HUGGINGFACE_ACCESS_TOKEN: str
+
 
 settings = AppSettings()

@@ -1,7 +1,8 @@
-import sys
 import os
+import sys
+
 # Add the project root to path to resolve module imports
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 
 from core import get_logger

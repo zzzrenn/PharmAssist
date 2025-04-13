@@ -1,7 +1,8 @@
-import sys
 import os
+import sys
+
 # Add the project root to path to resolve module imports
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from typing import Any
 
@@ -28,15 +29,10 @@ def handler(event, context: LambdaContext | None = None) -> dict[str, Any]:
     return {"statusCode": 200, "body": "Link processed successfully"}
 
 
-
 if __name__ == "__main__":
     url = "https://www.nice.org.uk/guidance/ng106"
 
-    event = {
-        "Records": [
-            {"body": url}
-        ]
-    }
+    event = {"Records": [{"body": url}]}
     handler(event, None)
 
     # crawler = NiceCrawler()

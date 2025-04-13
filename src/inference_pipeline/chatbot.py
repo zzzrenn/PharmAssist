@@ -1,16 +1,17 @@
 import pprint
 
 import opik
+import torch
 from config import settings
-from core import logger_utils
-from core.opik_utils import add_to_dataset_with_sampling
-from core.rag.retriever import VectorRetriever
 from langchain.prompts import PromptTemplate
 from opik import opik_context
 from prompt_templates import InferenceTemplate
-from utils import compute_num_tokens, truncate_text_to_max_tokens
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-import torch
+from utils import compute_num_tokens, truncate_text_to_max_tokens
+
+from core import logger_utils
+from core.opik_utils import add_to_dataset_with_sampling
+from core.rag.retriever import VectorRetriever
 
 logger = logger_utils.get_logger(__name__)
 
@@ -21,17 +22,18 @@ class Chatbot:
         if not mock:
             # Initialize model from Hugging Face using config
             self.tokenizer = AutoTokenizer.from_pretrained(
-                settings.MODEL_ID,
-                trust_remote_code=True
+                settings.MODEL_ID, trust_remote_code=True
             )
             # Set padding token if not already set
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
-            
+
             device = settings.MODEL_DEVICE
             if device.startswith("cuda") and not torch.cuda.is_available():
                 device = "cpu"
-                logger.warning("CUDA device requested but not available. Falling back to CPU.")
+                logger.warning(
+                    "CUDA device requested but not available. Falling back to CPU."
+                )
             else:
                 logger.info("Using CUDA device for LLM.")
 
@@ -41,25 +43,24 @@ class Chatbot:
                     load_in_4bit=True,
                     bnb_4bit_quant_type="nf4",
                     bnb_4bit_compute_dtype=torch.bfloat16,
-                    bnb_4bit_use_double_quant=True
+                    bnb_4bit_use_double_quant=True,
                 )
                 model_kwargs = {
                     "quantization_config": quantization_config,
                     "device_map": device,
-                    "trust_remote_code": True
+                    "trust_remote_code": True,
                 }
                 logger.info("Using bitsandbytes quantization for LLM.")
             else:
                 model_kwargs = {
                     "device_map": device,
                     "trust_remote_code": True,
-                    "torch_dtype": torch.float32
+                    "torch_dtype": torch.float32,
                 }
 
             # Load model
             self.model = AutoModelForCausalLM.from_pretrained(
-                settings.MODEL_ID,
-                **model_kwargs
+                settings.MODEL_ID, **model_kwargs
             )
             self.model.eval()  # Set to evaluation mode
         self.prompt_template_builder = InferenceTemplate()
@@ -147,23 +148,21 @@ class Chatbot:
 
         # Format messages according to Qwen's chat template
         formatted_messages = self.tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True
+            messages, tokenize=False, add_generation_prompt=True
         )
-        
+
         # Tokenize the input without padding
         inputs = self.tokenizer(
             formatted_messages,
             return_tensors="pt",
             truncation=True,
-            max_length=settings.MAX_INPUT_TOKENS
+            max_length=settings.MAX_INPUT_TOKENS,
         )
-        
+
         # Move input tensors to the same device as the model
         device = next(self.model.parameters()).device
         inputs = {k: v.to(device) for k, v in inputs.items()}
-        
+
         # Generate response
         with torch.no_grad():
             outputs = self.model.generate(
@@ -177,11 +176,13 @@ class Chatbot:
                 pad_token_id=self.tokenizer.pad_token_id,
                 eos_token_id=self.tokenizer.eos_token_id,
                 repetition_penalty=1.1,
-                use_cache=True  # Enable KV cache for faster generation
+                use_cache=True,  # Enable KV cache for faster generation
             )
-        
+
         # Decode the response and remove the input prompt
-        answer = self.tokenizer.decode(outputs[0, inputs["input_ids"].shape[1]:], skip_special_tokens=True)
+        answer = self.tokenizer.decode(
+            outputs[0, inputs["input_ids"].shape[1] :], skip_special_tokens=True
+        )
         answer = answer.strip()
-        
+
         return answer

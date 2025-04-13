@@ -1,5 +1,6 @@
-from core.rag.prompt_templates import BasePromptTemplate
 from langchain.prompts import PromptTemplate
+
+from core.rag.prompt_templates import BasePromptTemplate
 
 
 class InferenceTemplate(BasePromptTemplate):
@@ -11,7 +12,7 @@ class InferenceTemplate(BasePromptTemplate):
 {question}
 """
 
-    rag_system_prompt: str = """You are a clinical guideline assistant for pharmacists. Respond ONLY using exact recommendations from provided documents. 
+    rag_system_prompt: str = """You are a clinical guideline assistant for pharmacists. Respond ONLY using exact recommendations from provided documents.
     **Critical Rules**:
     - Preserve exact numerical values
     - Highlight 'Do not'/'Contraindicated' statements first

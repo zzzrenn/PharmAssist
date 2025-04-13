@@ -5,6 +5,7 @@ from typing import Generic, Iterable, List, Optional, TypeVar
 
 from bytewax.inputs import FixedPartitionedSource, StatefulSourcePartition
 from config import settings
+
 from core import get_logger
 from core.mq import RabbitMQConnection
 
@@ -34,7 +35,7 @@ class RabbitMQPartition(StatefulSourcePartition, Generic[DataT, MessageT]):
             )
         except Exception:
             logger.error(
-                f"Error while fetching message from queue.", queue_name=self.queue_name
+                "Error while fetching message from queue.", queue_name=self.queue_name
             )
             time.sleep(10)  # Sleep for 10 seconds before retrying to access the queue.
 

@@ -49,7 +49,7 @@ class BaseDocument(BaseModel):
                 result = collection.update_one(
                     {"_id": str(self.id)},
                     {"$set": self.to_mongo(**kwargs)},
-                    upsert=False
+                    upsert=False,
                 )
                 return result.upserted_id
             else:

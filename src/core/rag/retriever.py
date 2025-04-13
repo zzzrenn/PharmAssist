@@ -1,18 +1,18 @@
 import concurrent.futures
-import os
+
 import opik
-from core.config import settings
+import torch
 from qdrant_client import models
 from sentence_transformers.SentenceTransformer import SentenceTransformer
 
 import core.logger_utils as logger_utils
 from core import lib
+from core.config import settings
 from core.db.qdrant import QdrantDatabaseConnector
 from core.rag.query_expansion import QueryExpansion
 from core.rag.reranking import Reranker
 from core.rag.self_query import SelfQuery
 
-import torch
 logger = logger_utils.get_logger(__name__)
 
 
@@ -27,7 +27,9 @@ class VectorRetriever:
         device = settings.EMBEDDING_MODEL_DEVICE
         if device.startswith("cuda") and not torch.cuda.is_available():
             device = "cpu"
-            logger.warning("CUDA device requested but not available. Falling back to CPU.")
+            logger.warning(
+                "CUDA device requested but not available. Falling back to CPU."
+            )
         else:
             logger.info("Using CUDA device for embeddings.")
         self._embedder = SentenceTransformer(settings.EMBEDDING_MODEL_ID, device=device)
@@ -44,16 +46,18 @@ class VectorRetriever:
             self._client.search(
                 collection_name="vector_nice",
                 query_filter=models.Filter(
-                    must=[
-                        models.FieldCondition(
-                            key="author_id",
-                            match=models.MatchValue(
-                                value=author_id,
-                            ),
-                        )
-                    ]
-                    if author_id
-                    else None
+                    must=(
+                        [
+                            models.FieldCondition(
+                                key="author_id",
+                                match=models.MatchValue(
+                                    value=author_id,
+                                ),
+                            )
+                        ]
+                        if author_id
+                        else None
+                    )
                 ),
                 query_vector=query_vector,
                 limit=k,

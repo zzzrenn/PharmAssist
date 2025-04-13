@@ -1,4 +1,3 @@
-
 import re
 
 from aws_lambda_powertools import Logger
@@ -12,7 +11,9 @@ class CrawlerDispatcher:
         self._crawlers = {}
 
     def register(self, domain: str, crawler: type[BaseAbstractCrawler]) -> None:
-        self._crawlers[r"https://(www\.)?{}.org.uk/*".format(re.escape(domain))] = crawler
+        self._crawlers[r"https://(www\.)?{}.org.uk/*".format(re.escape(domain))] = (
+            crawler
+        )
 
     def get_crawler(self, url: str) -> BaseAbstractCrawler:
         for pattern, crawler in self._crawlers.items():

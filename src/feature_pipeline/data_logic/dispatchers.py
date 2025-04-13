@@ -1,7 +1,3 @@
-from core import get_logger
-from models.base import DataModel
-from models.raw import NiceRawModel
-
 from data_logic.chunking_data_handlers import (
     ChunkingDataHandler,
     NiceChunkingHandler,
@@ -14,6 +10,10 @@ from data_logic.embedding_data_handlers import (
     EmbeddingDataHandler,
     NiceEmbeddingHandler,
 )
+from models.base import DataModel
+from models.raw import NiceRawModel
+
+from core import get_logger
 
 logger = get_logger(__name__)
 

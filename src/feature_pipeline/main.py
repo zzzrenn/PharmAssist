@@ -1,11 +1,11 @@
-import sys
 import os
+import sys
+
 # Add the project root to path to resolve module imports
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 import bytewax.operators as op
 from bytewax.dataflow import Dataflow
-from core.db.qdrant import QdrantDatabaseConnector
 from data_flow.stream_input import RabbitMQSource
 from data_flow.stream_output import QdrantOutput
 from data_logic.dispatchers import (
@@ -14,6 +14,8 @@ from data_logic.dispatchers import (
     EmbeddingDispatcher,
     RawDispatcher,
 )
+
+from core.db.qdrant import QdrantDatabaseConnector
 
 connection = QdrantDatabaseConnector()
 

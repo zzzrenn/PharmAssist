@@ -1,6 +1,6 @@
-from core.config import settings
 from langchain_openai import ChatOpenAI
 
+from core.config import settings
 from core.rag.prompt_templates import RerankingTemplate
 
 

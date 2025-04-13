@@ -1,11 +1,12 @@
-import time
 from abc import ABC, abstractmethod
 from tempfile import mkdtemp
 
-from core.db.documents import BaseDocument
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+
+from core.db.documents import BaseDocument
+
 
 class BaseAbstractCrawler(ABC):
     model: type[BaseDocument]
@@ -16,7 +17,7 @@ class BaseAbstractCrawler(ABC):
         options = webdriver.ChromeOptions()
 
         options.add_argument("--headless=new")
-        options.add_argument('--no-sandbox')
+        options.add_argument("--no-sandbox")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1280x1696")
         options.add_argument("--single-process")
@@ -32,7 +33,7 @@ class BaseAbstractCrawler(ABC):
         self.set_extra_driver_options(options)
 
         self.driver = webdriver.Chrome(
-            service=Service(executable_path='/opt/chromedriver'),
+            service=Service(executable_path="/opt/chromedriver"),
             options=options,
         )
 

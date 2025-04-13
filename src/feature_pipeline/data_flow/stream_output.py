@@ -1,8 +1,9 @@
 from bytewax.outputs import DynamicSink, StatelessSinkPartition
-from core import get_logger
-from core.db.qdrant import QdrantDatabaseConnector
 from models.base import VectorDBDataModel
 from qdrant_client.models import Batch, PointIdsList
+
+from core import get_logger
+from core.db.qdrant import QdrantDatabaseConnector
 
 logger = get_logger(__name__)
 
@@ -42,7 +43,9 @@ class QdrantOutput(DynamicSink):
                         collection_name=collection_name
                     )
 
-    def build(self, step_id: str, worker_index: int, worker_count: int) -> StatelessSinkPartition:
+    def build(
+        self, step_id: str, worker_index: int, worker_count: int
+    ) -> StatelessSinkPartition:
         if self._sink_type == "clean":
             return QdrantCleanedDataSink(connection=self._connection)
         elif self._sink_type == "vector":
@@ -59,14 +62,13 @@ class QdrantCleanedDataSink(StatelessSinkPartition):
         payloads = [item.to_payload() for item in items]
         ids, data = zip(*payloads)
         collection_name = get_clean_collection(data_type=data[0]["type"])
-        
+
         # Check if points exist
         existing_points = self._client._instance.retrieve(
-            collection_name=collection_name,
-            ids=ids
+            collection_name=collection_name, ids=ids
         )
         operation = "update" if existing_points else "insert"
-        
+
         self._client.write_data(
             collection_name=collection_name,
             points=Batch(ids=ids, vectors={}, payloads=data),
@@ -76,7 +78,7 @@ class QdrantCleanedDataSink(StatelessSinkPartition):
             f"Successfully performed {operation} on requested cleaned point(s)",
             collection_name=collection_name,
             num=len(ids),
-            operation=operation
+            operation=operation,
         )
 
 
@@ -88,35 +90,28 @@ class QdrantVectorDataSink(StatelessSinkPartition):
         payloads = [item.to_payload() for item in items]
         ids, vectors, meta_data = zip(*payloads)
         collection_name = get_vector_collection(data_type=meta_data[0]["type"])
-        
+
         # Find and delete existing vectors by id in metadata
         existing_points = self._client._instance.scroll(
             collection_name=collection_name,
             scroll_filter={
-                "must": [
-                    {
-                        "key": "id",
-                        "match": {
-                            "value": meta_data[0]["id"]
-                        }
-                    }
-                ]
+                "must": [{"key": "id", "match": {"value": meta_data[0]["id"]}}]
             },
-            limit=10000
+            limit=10000,
         )[0]
-        
+
         if existing_points:
             qdrant_ids = [point.id for point in existing_points]
             self._client._instance.delete(
                 collection_name=collection_name,
-                points_selector=PointIdsList(points=qdrant_ids)
+                points_selector=PointIdsList(points=qdrant_ids),
             )
             logger.info(
                 "Deleted existing vector point(s)",
                 collection_name=collection_name,
-                num=len(qdrant_ids)
+                num=len(qdrant_ids),
             )
-        
+
         # Insert new points
         self._client.write_data(
             collection_name=collection_name,
@@ -126,7 +121,7 @@ class QdrantVectorDataSink(StatelessSinkPartition):
         logger.info(
             "Successfully inserted vector point(s)",
             collection_name=collection_name,
-            num=len(ids)
+            num=len(ids),
         )
 
 

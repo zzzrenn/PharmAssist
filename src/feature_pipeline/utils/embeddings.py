@@ -1,8 +1,7 @@
-from InstructorEmbedding import INSTRUCTOR
-from sentence_transformers.SentenceTransformer import SentenceTransformer
 import torch
-
 from config import settings
+from sentence_transformers.SentenceTransformer import SentenceTransformer
+
 from core.logger_utils import get_logger
 
 logger = get_logger(__name__)
@@ -22,10 +21,12 @@ class EmbeddingModelManager:
         device = settings.EMBEDDING_MODEL_DEVICE
         if device.startswith("cuda") and not torch.cuda.is_available():
             device = "cpu"
-            logger.warning("CUDA device requested but not available. Falling back to CPU.")
+            logger.warning(
+                "CUDA device requested but not available. Falling back to CPU."
+            )
         else:
             logger.info("Using CUDA device for embeddings.")
-        
+
         self._model = SentenceTransformer(settings.EMBEDDING_MODEL_ID, device=device)
 
     def encode(self, text: str):

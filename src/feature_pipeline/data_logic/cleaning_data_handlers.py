@@ -20,9 +20,11 @@ class CleaningDataHandler(ABC):
 class NiceCleaningHandler(CleaningDataHandler):
     def clean(self, data_model: NiceRawModel) -> NiceCleanedModel:
         # Join all chapter markdown content with newlines between chapters
-        joined_text = "\n\n".join(
-            chapter["markdown"] for chapter in data_model.chapters
-        ) if data_model and data_model.chapters else None
+        joined_text = (
+            "\n\n".join(chapter["markdown"] for chapter in data_model.chapters)
+            if data_model and data_model.chapters
+            else None
+        )
 
         return NiceCleanedModel(
             entry_id=data_model.entry_id,

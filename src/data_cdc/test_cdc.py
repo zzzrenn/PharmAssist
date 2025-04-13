@@ -1,9 +1,9 @@
-from pymongo import MongoClient
-import uuid
 import random
 import string
+import uuid
 
 from config import settings
+from pymongo import MongoClient
 
 
 def insert_data_to_mongodb(uri, database_name, collection_name, data):
@@ -29,6 +29,7 @@ def insert_data_to_mongodb(uri, database_name, collection_name, data):
         print(f"An error occurred: {e}")
     finally:
         client.close()
+
 
 def update_data_in_mongodb(uri, database_name, collection_name, data):
     """
@@ -56,15 +57,16 @@ def update_data_in_mongodb(uri, database_name, collection_name, data):
     finally:
         client.close()
 
+
 def generate_random_text(num_words=100):
     """Generate random text with specified number of words."""
     words = []
     for _ in range(num_words):
         # Generate random word of length 3-10 characters
         word_length = random.randint(3, 10)
-        word = ''.join(random.choices(string.ascii_lowercase, k=word_length))
+        word = "".join(random.choices(string.ascii_lowercase, k=word_length))
         words.append(word)
-    return ' '.join(words)
+    return " ".join(words)
 
 
 if __name__ == "__main__":
@@ -72,7 +74,12 @@ if __name__ == "__main__":
         settings.MONGO_DATABASE_HOST,
         "pharmassist",
         "test_collection",
-        {"url": "https://www.nice.org.uk/guidance/ng133", "title": "Test title", "last_updated": "2024-01-01", "chapters": [{"markdown": "Test chapter"}]}
+        {
+            "url": "https://www.nice.org.uk/guidance/ng133",
+            "title": "Test title",
+            "last_updated": "2024-01-01",
+            "chapters": [{"markdown": "Test chapter"}],
+        },
     )
 
     random_year = random.randint(1900, 2025)
@@ -81,5 +88,10 @@ if __name__ == "__main__":
         settings.MONGO_DATABASE_HOST,
         "pharmassist",
         "test_collection",
-        {"url": "https://www.nice.org.uk/guidance/ng133", "title": "Test title", "last_updated": f"{random_year}-01-01", "chapters": [{"markdown": random_text}]}
+        {
+            "url": "https://www.nice.org.uk/guidance/ng133",
+            "title": "Test title",
+            "last_updated": f"{random_year}-01-01",
+            "chapters": [{"markdown": random_text}],
+        },
     )

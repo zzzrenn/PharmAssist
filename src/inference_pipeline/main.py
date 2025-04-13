@@ -1,13 +1,14 @@
-import sys
-import sys
 import os
+import sys
+
 # Add the project root to path to resolve module imports
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+
+from chatbot import Chatbot
+from huggingface_hub import login
 
 from core import logger_utils
 from core.config import settings
-from chatbot import Chatbot
-from huggingface_hub import login
 
 logger = logger_utils.get_logger(__name__)
 
