@@ -23,7 +23,7 @@ def insert_data_to_mongodb(uri, database_name, collection_name, data):
         # Generate a UUID for the document
         doc_id = str(uuid.uuid4())
         data["_id"] = doc_id
-        result = collection.insert_one(data)
+        _ = collection.insert_one(data)
         print(f"Data inserted with _id: {doc_id}")
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -48,7 +48,7 @@ def update_data_in_mongodb(uri, database_name, collection_name, data):
         old_data = collection.find_one({"url": data["url"]})
         if old_data:
             data["_id"] = old_data["_id"]  # Preserve the existing UUID
-            result = collection.update_one({"_id": old_data["_id"]}, {"$set": data})
+            _ = collection.update_one({"_id": old_data["_id"]}, {"$set": data})
             print(f"Data updated with _id: {old_data['_id']}")
         else:
             print("No document found to update")

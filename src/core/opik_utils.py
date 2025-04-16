@@ -15,7 +15,7 @@ try:
     import opik
     from comet_ml import Experiment
     from opik.configurator.configure import OpikConfigurator
-except:
+except ImportError:
     logger.info("Could not import Opik and Comet.")
 
 
@@ -85,9 +85,9 @@ def create_dataset_from_artifacts(
                 continue
 
             testing_artifact_file = list(artifact_dir.glob("*_testing.json"))
-            assert (
-                len(testing_artifact_file) == 1
-            ), "Expected exactly one testing artifact file."
+            assert len(testing_artifact_file) == 1, (
+                "Expected exactly one testing artifact file."
+            )
             testing_artifact_file = testing_artifact_file[0]
 
             logger.info(f"Loading testing data from: {testing_artifact_file}")

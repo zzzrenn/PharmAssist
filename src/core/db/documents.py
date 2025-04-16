@@ -6,7 +6,7 @@ from pymongo import errors
 
 import core.logger_utils as logger_utils
 from core.db.mongo import connection
-from core.errors import ImproperlyConfigured
+from core.errors import ImproperlyConfiguredError
 
 _database = connection.get_database("pharmassist")
 
@@ -105,7 +105,7 @@ class BaseDocument(BaseModel):
     @classmethod
     def _get_collection_name(cls):
         if not hasattr(cls, "Settings") or not hasattr(cls.Settings, "name"):
-            raise ImproperlyConfigured(
+            raise ImproperlyConfiguredError(
                 "Document should define an Settings configuration class with the name of the collection."
             )
 

@@ -1,9 +1,9 @@
 import time
 
 from bs4 import BeautifulSoup
-from crawlers.base import BaseAbstractCrawler
 
 from core.db.documents import NiceDocument
+from crawlers.base import BaseAbstractCrawler
 
 
 class NiceCrawler(BaseAbstractCrawler):
@@ -123,9 +123,9 @@ class NiceCrawler(BaseAbstractCrawler):
                                 ["h1", "h2"], class_="title"
                             )
                             if main_title:
-                                chapter_data[
-                                    "markdown"
-                                ] += f"# {main_title.text.strip()}\n\n"
+                                chapter_data["markdown"] += (
+                                    f"# {main_title.text.strip()}\n\n"
+                                )
 
                             # Extract all content in a hierarchical manner
                             sections = content_source.find_all(
@@ -141,9 +141,7 @@ class NiceCrawler(BaseAbstractCrawler):
                                 for heading in all_headings:
                                     level = int(heading.name[1])
                                     markdown_heading = "#" * level
-                                    chapter_data[
-                                        "markdown"
-                                    ] += (
+                                    chapter_data["markdown"] += (
                                         f"{markdown_heading} {heading.text.strip()}\n\n"
                                     )
 
@@ -169,21 +167,21 @@ class NiceCrawler(BaseAbstractCrawler):
                                                     f"[{link_text}]({link_url})",
                                                 )
 
-                                            chapter_data[
-                                                "markdown"
-                                            ] += f"{paragraph_text}\n\n"
+                                            chapter_data["markdown"] += (
+                                                f"{paragraph_text}\n\n"
+                                            )
                                         elif next_el.name in ["ul", "ol"]:
                                             for i, li in enumerate(
                                                 next_el.find_all("li")
                                             ):
                                                 if next_el.name == "ol":
-                                                    chapter_data[
-                                                        "markdown"
-                                                    ] += f"{i+1}. {li.text.strip()}\n"
+                                                    chapter_data["markdown"] += (
+                                                        f"{i + 1}. {li.text.strip()}\n"
+                                                    )
                                                 else:
-                                                    chapter_data[
-                                                        "markdown"
-                                                    ] += f"* {li.text.strip()}\n"
+                                                    chapter_data["markdown"] += (
+                                                        f"* {li.text.strip()}\n"
+                                                    )
                                             chapter_data["markdown"] += "\n"
                                         next_el = next_el.find_next_sibling()
                             else:
@@ -193,9 +191,9 @@ class NiceCrawler(BaseAbstractCrawler):
                                         # It's a heading
                                         level = int(section.name[1])
                                         markdown_heading = "#" * level
-                                        chapter_data[
-                                            "markdown"
-                                        ] += f"{markdown_heading} {section.text.strip()}\n\n"
+                                        chapter_data["markdown"] += (
+                                            f"{markdown_heading} {section.text.strip()}\n\n"
+                                        )
                                     elif section.name == "p":
                                         # It's a paragraph - convert links to markdown format
                                         paragraph_text = section.text.strip()
@@ -211,9 +209,9 @@ class NiceCrawler(BaseAbstractCrawler):
                                                 link_text, f"[{link_text}]({link_url})"
                                             )
 
-                                        chapter_data[
-                                            "markdown"
-                                        ] += f"{paragraph_text}\n\n"
+                                        chapter_data["markdown"] += (
+                                            f"{paragraph_text}\n\n"
+                                        )
                                     elif (
                                         section.name == "div"
                                         and section.get("class")
@@ -226,9 +224,9 @@ class NiceCrawler(BaseAbstractCrawler):
                                         if section_title:
                                             level = int(section_title.name[1])
                                             markdown_heading = "#" * level
-                                            chapter_data[
-                                                "markdown"
-                                            ] += f"{markdown_heading} {section_title.text.strip()}\n\n"
+                                            chapter_data["markdown"] += (
+                                                f"{markdown_heading} {section_title.text.strip()}\n\n"
+                                            )
 
                                         # Get all paragraphs and lists in this section
                                         for element in section.find_all(
@@ -253,9 +251,9 @@ class NiceCrawler(BaseAbstractCrawler):
                                                         f"[{link_text}]({link_url})",
                                                     )
 
-                                                chapter_data[
-                                                    "markdown"
-                                                ] += f"{paragraph_text}\n\n"
+                                                chapter_data["markdown"] += (
+                                                    f"{paragraph_text}\n\n"
+                                                )
                                             elif element.name in ["ul", "ol"]:
                                                 for i, li in enumerate(
                                                     element.find_all("li")
@@ -281,13 +279,13 @@ class NiceCrawler(BaseAbstractCrawler):
                                                         )
 
                                                     if element.name == "ol":
-                                                        chapter_data[
-                                                            "markdown"
-                                                        ] += f"{i+1}. {li_text}\n"
+                                                        chapter_data["markdown"] += (
+                                                            f"{i + 1}. {li_text}\n"
+                                                        )
                                                     else:
-                                                        chapter_data[
-                                                            "markdown"
-                                                        ] += f"* {li_text}\n"
+                                                        chapter_data["markdown"] += (
+                                                            f"* {li_text}\n"
+                                                        )
                                                 chapter_data["markdown"] += "\n"
                         else:
                             # Fallback: just get all text from content_div with basic markdown formatting

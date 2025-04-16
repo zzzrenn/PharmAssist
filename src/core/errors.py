@@ -1,2 +1,2 @@
-class ImproperlyConfigured(Exception):
+class ImproperlyConfiguredError(Exception):
     pass

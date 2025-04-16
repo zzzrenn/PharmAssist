@@ -21,9 +21,7 @@ class AppSettings(BaseSettings):
     RABBITMQ_PORT: int = 5672
 
     # QdrantDB config
-    QDRANT_CLOUD_URL: str = (
-        "https://c8820847-221d-42b6-9a77-75afc147c89b.eu-central-1-0.aws.cloud.qdrant.io"
-    )
+    QDRANT_CLOUD_URL: str = "https://c8820847-221d-42b6-9a77-75afc147c89b.eu-central-1-0.aws.cloud.qdrant.io"
     QDRANT_DATABASE_HOST: str = "qdrant"
     QDRANT_DATABASE_PORT: int = 6333
     USE_QDRANT_CLOUD: bool = True
