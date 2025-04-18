@@ -1,5 +1,4 @@
 import random
-import string
 import uuid
 
 from config import settings
@@ -58,18 +57,8 @@ def update_data_in_mongodb(uri, database_name, collection_name, data):
         client.close()
 
 
-def generate_random_text(num_words=100):
-    """Generate random text with specified number of words."""
-    words = []
-    for _ in range(num_words):
-        # Generate random word of length 3-10 characters
-        word_length = random.randint(3, 10)
-        word = "".join(random.choices(string.ascii_lowercase, k=word_length))
-        words.append(word)
-    return " ".join(words)
-
-
 if __name__ == "__main__":
+    length = random.randint(1, 100)
     insert_data_to_mongodb(
         settings.MONGO_DATABASE_HOST,
         "pharmassist",
@@ -78,12 +67,20 @@ if __name__ == "__main__":
             "url": "https://www.nice.org.uk/guidance/ng133",
             "title": "Test title",
             "last_updated": "2024-01-01",
-            "chapters": [{"markdown": "Test chapter"}],
+            "chapters": [
+                {
+                    "title": "Test chapter 1",
+                    "markdown": str(length) + "".join(["a"] * length),
+                },
+                {
+                    "title": "Test chapter 2",
+                    "markdown": str(length) + "".join(["b"] * length),
+                },
+            ],
         },
     )
 
     random_year = random.randint(1900, 2025)
-    random_text = generate_random_text(100)
     update_data_in_mongodb(
         settings.MONGO_DATABASE_HOST,
         "pharmassist",
@@ -92,6 +89,15 @@ if __name__ == "__main__":
             "url": "https://www.nice.org.uk/guidance/ng133",
             "title": "Test title",
             "last_updated": f"{random_year}-01-01",
-            "chapters": [{"markdown": random_text}],
+            "chapters": [
+                {
+                    "title": "Test chapter 1",
+                    "markdown": str(length) + "".join(["c"] * length),
+                },
+                {
+                    "title": "Test chapter 2",
+                    "markdown": str(length) + "".join(["d"] * length),
+                },
+            ],
         },
     )
