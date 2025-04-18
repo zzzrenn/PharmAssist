@@ -17,6 +17,7 @@ class VectorDBDataModel(ABC, DataModel):
     Abstract class for all data models that need to be saved into a vector DB (e.g. Qdrant)
     """
 
+    id: str
     entry_id: int
     type: str
 

@@ -22,7 +22,7 @@ connection = QdrantDatabaseConnector()
 flow = Dataflow("Streaming ingestion pipeline")
 stream = op.input("input", flow, RabbitMQSource())
 stream = op.map("raw dispatch", stream, RawDispatcher.handle_mq_message)
-stream = op.map("clean dispatch", stream, CleaningDispatcher.dispatch_cleaner)
+stream = op.flat_map("clean dispatch", stream, CleaningDispatcher.dispatch_cleaner)
 op.output(
     "cleaned data insert to qdrant",
     stream,

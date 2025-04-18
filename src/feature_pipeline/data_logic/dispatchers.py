@@ -1,3 +1,5 @@
+from typing import List
+
 from data_logic.chunking_data_handlers import (
     ChunkingDataHandler,
     NiceChunkingHandler,
@@ -48,18 +50,18 @@ class CleaningDispatcher:
     cleaning_factory = CleaningHandlerFactory()
 
     @classmethod
-    def dispatch_cleaner(cls, data_model: DataModel) -> DataModel:
+    def dispatch_cleaner(cls, data_model: DataModel) -> List[DataModel]:
         data_type = data_model.type
         handler = cls.cleaning_factory.create_handler(data_type)
-        clean_model = handler.clean(data_model)
+        clean_models_list = handler.clean(data_model)
 
         logger.info(
-            "Data cleaned successfully.",
+            "Data cleaned successfully into multiple models.",
             data_type=data_type,
-            cleaned_content_len=len(clean_model.cleaned_content),
+            num_cleaned_models=len(clean_models_list),
         )
 
-        return clean_model
+        return clean_models_list
 
 
 class ChunkingHandlerFactory:

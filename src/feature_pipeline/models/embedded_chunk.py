@@ -11,6 +11,7 @@ class NiceEmbeddedChunkModel(VectorDBDataModel):
     chunk_content: str
     embedded_content: list[float]
     title: str
+    chapter: str
     url: str
     last_updated: str
     type: str
@@ -22,6 +23,7 @@ class NiceEmbeddedChunkModel(VectorDBDataModel):
         data = {
             "id": self.entry_id,
             "title": self.title,
+            "chapter": self.chapter,
             "url": self.url,
             "last_updated": self.last_updated,
             "content": self.chunk_content,

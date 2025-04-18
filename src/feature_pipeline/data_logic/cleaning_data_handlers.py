@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 from models.base import DataModel
 from models.clean import NiceCleanedModel
@@ -13,24 +14,31 @@ class CleaningDataHandler(ABC):
     """
 
     @abstractmethod
-    def clean(self, data_model: DataModel) -> DataModel:
+    def clean(self, data_model: DataModel) -> List[DataModel]:
         pass
 
 
 class NiceCleaningHandler(CleaningDataHandler):
-    def clean(self, data_model: NiceRawModel) -> NiceCleanedModel:
-        # Join all chapter markdown content with newlines between chapters
-        joined_text = (
-            "\n\n".join(chapter["markdown"] for chapter in data_model.chapters)
-            if data_model and data_model.chapters
-            else None
-        )
+    def clean(self, data_model: NiceRawModel) -> List[NiceCleanedModel]:
+        cleaned_models = []
 
-        return NiceCleanedModel(
-            entry_id=data_model.entry_id,
-            title=data_model.title,
-            url=data_model.url,
-            last_updated=data_model.last_updated,
-            cleaned_content=clean_text(joined_text),
-            type=data_model.type,
-        )
+        if data_model and data_model.chapters:
+            for chapter in data_model.chapters:
+                cleaned_text = ""
+                if chapter and "markdown" in chapter and chapter["markdown"]:
+                    cleaned_text = clean_text(chapter["markdown"])
+
+                # Create a new NiceCleanedModel for each chapter
+                chapter_model = NiceCleanedModel(
+                    entry_id=data_model.entry_id,
+                    title=data_model.title,
+                    url=data_model.url,
+                    last_updated=data_model.last_updated,
+                    chapter=chapter["title"],
+                    cleaned_content=cleaned_text,
+                    type=data_model.type,
+                )
+                cleaned_models.append(chapter_model)
+
+        # If no chapters, return an empty list
+        return cleaned_models

@@ -27,9 +27,11 @@ class NiceChunkingHandler(ChunkingDataHandler):
 
         for chunk in chunks:
             model = NiceChunkModel(
+                id=data_model.id,
                 entry_id=data_model.entry_id,
                 chunk_id=hashlib.md5(chunk.encode()).hexdigest(),
                 title=data_model.title,
+                chapter=data_model.chapter,
                 url=data_model.url,
                 last_updated=data_model.last_updated,
                 chunk_content=chunk,

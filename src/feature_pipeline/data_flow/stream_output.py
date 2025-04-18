@@ -62,23 +62,39 @@ class QdrantCleanedDataSink(StatelessSinkPartition):
         payloads = [item.to_payload() for item in items]
         ids, data = zip(*payloads)
         collection_name = get_clean_collection(data_type=data[0]["type"])
+        entry_id = data[0]["entry_id"]
 
-        # Check if points exist
-        existing_points = self._client._instance.retrieve(
-            collection_name=collection_name, ids=ids
-        )
-        operation = "update" if existing_points else "insert"
+        # Find and delete existing vectors by id in metadata
+        existing_points = self._client._instance.scroll(
+            collection_name=collection_name,
+            scroll_filter={"must": [{"key": "entry_id", "match": {"value": entry_id}}]},
+            limit=10000,
+        )[0]
 
+        if existing_points:
+            qdrant_ids = [point.id for point in existing_points]
+            self._client._instance.delete(
+                collection_name=collection_name,
+                points_selector=PointIdsList(points=qdrant_ids),
+            )
+            logger.info(
+                "Deleted cleaned data",
+                collection_name=collection_name,
+                num=len(qdrant_ids),
+                entry_id=entry_id,
+            )
+
+        # Insert new points
         self._client.write_data(
             collection_name=collection_name,
             points=Batch(ids=ids, vectors={}, payloads=data),
         )
 
         logger.info(
-            f"Successfully performed {operation} on requested cleaned point(s)",
+            "Successfully inserted cleaned data",
             collection_name=collection_name,
             num=len(ids),
-            operation=operation,
+            entry_id=entry_id,
         )
 
 
@@ -90,13 +106,12 @@ class QdrantVectorDataSink(StatelessSinkPartition):
         payloads = [item.to_payload() for item in items]
         ids, vectors, meta_data = zip(*payloads)
         collection_name = get_vector_collection(data_type=meta_data[0]["type"])
+        match_id = meta_data[0]["id"]
 
         # Find and delete existing vectors by id in metadata
         existing_points = self._client._instance.scroll(
             collection_name=collection_name,
-            scroll_filter={
-                "must": [{"key": "id", "match": {"value": meta_data[0]["id"]}}]
-            },
+            scroll_filter={"must": [{"key": "id", "match": {"value": match_id}}]},
             limit=10000,
         )[0]
 
@@ -110,6 +125,7 @@ class QdrantVectorDataSink(StatelessSinkPartition):
                 "Deleted existing vector point(s)",
                 collection_name=collection_name,
                 num=len(qdrant_ids),
+                id=match_id,
             )
 
         # Insert new points
@@ -122,6 +138,7 @@ class QdrantVectorDataSink(StatelessSinkPartition):
             "Successfully inserted vector point(s)",
             collection_name=collection_name,
             num=len(ids),
+            id=match_id,
         )
 
 
