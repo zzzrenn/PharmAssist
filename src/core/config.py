@@ -30,6 +30,7 @@ class AppSettings(BaseSettings):
     )
 
     # Embeddings config
+    EMBEDDING_MODEL_PROVIDER: str = "huggingface"
     EMBEDDING_MODEL_ID: str = "BAAI/bge-small-en-v1.5"
     EMBEDDING_MODEL_MAX_INPUT_LENGTH: int = 512
     EMBEDDING_SIZE: int = 384

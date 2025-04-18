@@ -10,5 +10,6 @@ bytewax
 unstructured
 numpy
 langchain
+langchain-openai
 sentence-transformers
 InstructorEmbedding

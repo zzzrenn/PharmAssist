@@ -9,7 +9,7 @@ class NiceEmbeddedChunkModel(VectorDBDataModel):
     entry_id: str
     chunk_id: str
     chunk_content: str
-    embedded_content: np.ndarray
+    embedded_content: list[float]
     title: str
     url: str
     last_updated: str

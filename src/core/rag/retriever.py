@@ -3,12 +3,12 @@ import concurrent.futures
 import opik
 import torch
 from qdrant_client import models
-from sentence_transformers.SentenceTransformer import SentenceTransformer
 
 import core.logger_utils as logger_utils
 from core import lib
 from core.config import settings
 from core.db.qdrant import QdrantDatabaseConnector
+from core.models.embeddings import embedding_model_factory
 from core.rag.query_expansion import QueryExpansion
 from core.rag.reranking import Reranker
 from core.rag.self_query import SelfQuery
@@ -32,7 +32,7 @@ class VectorRetriever:
             )
         else:
             logger.info("Using CUDA device for embeddings.")
-        self._embedder = SentenceTransformer(settings.EMBEDDING_MODEL_ID, device=device)
+        self._embedder = embedding_model_factory.create_embedding_model()
         self._query_expander = QueryExpansion()
         self._metadata_extractor = SelfQuery() if settings.ENABLE_SELF_QUERY else None
         self._reranker = Reranker() if settings.ENABLE_RERANKING else None
@@ -40,7 +40,7 @@ class VectorRetriever:
     def _search_single_query(self, generated_query: str, author_id: str, k: int):
         assert k > 1, "k should be greater than 1"
 
-        query_vector = self._embedder.encode(generated_query).tolist()
+        query_vector = self._embedder.embed(generated_query)
 
         vectors = [
             self._client.search(
