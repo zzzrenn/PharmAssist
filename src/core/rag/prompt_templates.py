@@ -34,59 +34,39 @@ class QueryExpansionTemplate(BasePromptTemplate):
 
 
 class SelfQueryTemplate(BasePromptTemplate):
-    prompt: str = """You are an AI assistant designed to extract metadata from questions about clinical guidelines.
-    The required information to extract includes:
-    1. **Section type** (e.g., Recommendations, Context, Research, Implementation Guidance).
-    2. **Entities** (e.g., drugs, conditions, procedures).
-    3. **Demographics** (e.g., adults, elderly, pregnancy).
-    4. **Date filters** (e.g., last_updated).
-    5. **Guideline title** (e.g., "Chronic heart failure in adults: diagnosis and management").
+    prompt: str = """You are an AI assistant designed to extract chapter from questions about pharmaceutical guidelines.
+    The possible chapters are:
+    - Overview
+    - Recommendations
+    - Recommendations for research
+    - Rationale and impact
+    - Context
+    - Finding more information and committee details
+    - Update information
 
-    Your response must be a JSON object with two keys: `search_terms` (list of keywords) and `filters` (key-value pairs for metadata).
-    If no relevant metadata is found, return `"none"` for both keys.
+    Your response should consists of only the extracted chapter. If no chapter is found, return "none".
 
     ### Examples:
     QUESTION 1:
-    "What are the recommendations for beta-blockers in adults with heart failure?"
+    individualised care approach for type 2 diabetes
     RESPONSE 1:
-    {
-    "search_terms": ["beta-blockers", "recommendations"],
-    "filters": {
-        "section_type": ["Clinical Recommendations"],
-        "entities": ["beta-blockers", "heart failure"],
-        "demographics": ["adults"]
-        }
-    }
+    Recommendations
 
     QUESTION 2:
-    "Show tools for implementing heart failure guidelines."
+    Reasoning behind diagnosis recommendations of hypertension update
     RESPONSE 2:
-    {
-    "search_terms": ["tools", "implementing"],
-    "filters": {
-        "section_type": ["Implementation Guidance"],
-        "entities": ["heart failure"]
-        }
-    }
+    Rationale and impact
+
 
     QUESTION 3:
-    "I want general information about heart failure."
+    Update date for periodontitis information
     RESPONSE 3:
-    {
-    "search_terms": ["general information"],
-    "filters": {
-        "section_type": ["Overview", "Context"]
-        }
-    }
+    Update information
 
-    ### Notes:
-    - Use synonyms for section types (e.g., "guidance" to "Implementation Guidance").
-    - Ignore non-clinical terms (e.g., "tools" to filter by section_type, not entities).
-    - If no filters apply, return:
-    {
-    "search_terms": "none",
-    "filters": "none"
-    }
+    QUESTION 4:
+    What is the probability of side effects of paracetamol?
+    RESPONSE 4:
+    none
 
     User question: {question}"""
 

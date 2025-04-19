@@ -37,7 +37,7 @@ class VectorRetriever:
         self._metadata_extractor = SelfQuery() if settings.ENABLE_SELF_QUERY else None
         self._reranker = Reranker() if settings.ENABLE_RERANKING else None
 
-    def _search_single_query(self, generated_query: str, author_id: str, k: int):
+    def _search_single_query(self, generated_query: str, chapter_name: str, k: int):
         assert k > 1, "k should be greater than 1"
 
         query_vector = self._embedder.embed(generated_query)
@@ -49,13 +49,13 @@ class VectorRetriever:
                     must=(
                         [
                             models.FieldCondition(
-                                key="author_id",
+                                key="chapter",
                                 match=models.MatchValue(
-                                    value=author_id,
+                                    value=chapter_name,
                                 ),
                             )
                         ]
-                        if author_id
+                        if chapter_name
                         else None
                     )
                 ),
@@ -76,20 +76,20 @@ class VectorRetriever:
             num_queries=len(generated_queries),
         )
 
-        author_id = None
+        chapter_name = None
         if self._metadata_extractor:
-            author_id = self._metadata_extractor.generate_response(self.query)
-            if author_id:
+            chapter_name = self._metadata_extractor.generate_response(self.query)
+            if chapter_name:
                 logger.info(
-                    "Successfully extracted the author_id from the query.",
-                    author_id=author_id,
+                    "Successfully extracted the chapter name from the query.",
+                    chapter_name=chapter_name,
                 )
             else:
-                logger.warning("Did not found any author data in the user's prompt.")
+                logger.warning("Did not found any chapter name in the user's prompt.")
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             search_tasks = [
-                executor.submit(self._search_single_query, query, author_id, k)
+                executor.submit(self._search_single_query, query, chapter_name, k)
                 for query in generated_queries
             ]
 

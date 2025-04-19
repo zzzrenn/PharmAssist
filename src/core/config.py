@@ -37,8 +37,8 @@ class AppSettings(BaseSettings):
     EMBEDDING_MODEL_DEVICE: str = "cuda"
 
     # RAG config
-    ENABLE_SELF_QUERY: bool = False
-    ENABLE_RERANKING: bool = False
+    ENABLE_SELF_QUERY: bool = True
+    ENABLE_RERANKING: bool = True
 
     # OpenAI config
     OPENAI_MODEL_ID: str = "gpt-4o-mini"

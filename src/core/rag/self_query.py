@@ -3,9 +3,7 @@ from langchain_openai import ChatOpenAI
 from opik.integrations.langchain import OpikTracer
 
 import core.logger_utils as logger_utils
-from core import lib
 from core.config import settings
-from core.db.documents import NiceDocument
 from core.rag.prompt_templates import SelfQueryTemplate
 
 logger = logger_utils.get_logger(__name__)
@@ -27,22 +25,14 @@ class SelfQuery:
         chain = chain.with_config({"callbacks": [SelfQuery.opik_tracer]})
 
         response = chain.invoke({"question": query})
-        response = response.content
-        user_full_name = response.strip("\n ")
+        chapter_name = response.content
 
-        if user_full_name == "none":
+        if chapter_name == "none":
             return None
 
         logger.info(
-            "Successfully extracted the user full name from the query.",
-            user_full_name=user_full_name,
+            "Successfully extracted the chapter name from the query.",
+            chapter_name=chapter_name,
         )
-        first_name, last_name = lib.split_user_full_name(user_full_name)
-        logger.info(
-            "Successfully extracted the user first and last name from the query.",
-            first_name=first_name,
-            last_name=last_name,
-        )
-        user_id = NiceDocument.get_or_create(first_name=first_name, last_name=last_name)
 
-        return user_id
+        return chapter_name

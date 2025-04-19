@@ -36,8 +36,8 @@ class AppSettings(BaseSettings):
     EMBEDDING_MODEL_DEVICE: str = "cuda"
 
     # RAG config
-    ENABLE_SELF_QUERY: bool = False
-    ENABLE_RERANKING: bool = False
+    ENABLE_SELF_QUERY: bool = True
+    ENABLE_RERANKING: bool = True
     TOP_K: int = 5
     KEEP_TOP_K: int = 5
     EXPAND_N_QUERY: int = 5
