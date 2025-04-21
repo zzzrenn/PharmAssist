@@ -6,3 +6,4 @@ rabbitmq/
 qdrant-data/
 archive/
 .vscode/
+generated_dataset/

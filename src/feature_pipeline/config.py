@@ -20,9 +20,9 @@ class Settings(BaseSettings):
     EMBEDDING_SIZE: int = 384
     EMBEDDING_MODEL_DEVICE: str = "cuda"
 
-    # # OpenAI
-    # OPENAI_MODEL_ID: str = "gpt-4o-mini"
-    # OPENAI_API_KEY: str | None = None
+    # OpenAI
+    OPENAI_MODEL_ID: str = "gpt-4o-mini"
+    OPENAI_API_KEY: str | None = None
 
     # MQ config
     RABBITMQ_DEFAULT_USERNAME: str = "guest"
