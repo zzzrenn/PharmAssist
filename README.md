@@ -84,10 +84,10 @@ python src/inference_pipeline/main.py --query "What is the treatment for pregnan
 make evaluate-llm
 
 # Evaluate RAG system
-evaluate-rag
+make evaluate-rag
 
 # Evaluate Chatbot on monitoring dataset
-evaluate-llm-monitoring
+make evaluate-llm-monitoring
 ```
 
 ## Integration with AWS
