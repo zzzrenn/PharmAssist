@@ -36,6 +36,60 @@ PharmAssist is a RAG-based chatbot for pharmacist guidelines. It has a distribut
   - Read messages from RabbitMQ
 - **Dependencies**: RabbitMQ
 
+### 5. Inference Pipeline
+- **Description**: Handles user queries and provides responses using the RAG model.
+- **Features**:
+  - Query processing
+  - Retrieval of relevant documents from QdrantDB
+  - Response generation using LLM (Huggingface QWEN model)
+  - Queries, retrieved documents, and responses will be randomly saved to a monitoring dataset for evaluation.
+
+### 6. Evaluation
+- **Description**: Evaluates the performance of the RAG system and LLM using Opik.
+- **Features**:
+  - Evaluate LLM using test dataset, metrics: Hallucination, LevenshteinRatio, Moderation.
+  - Evaluate RAG system using test dataset, metrics: ContextPrecision, ContextRecall, Hallucination.
+  - Evaluate chatbot using monitoring dataset, metrics: AnswerRelevance, Hallucination, Moderation.
+
+## Installation and Setup
+### Install dependencies
+```
+pip install -r requirements.txt
+```
+
+### Initialize microservices
+build and run microservices (1-4) in docker.
+```
+make local-start
+```
+
+### Data ingestion
+crawl nice guideline and save it to mongoDB, then preprocess and save to qdrantDB
+```
+# one link
+make local-test-nice
+
+# all links
+make local-ingest-data
+```
+
+### Run inference
+```
+python src/inference_pipeline/main.py --query "What is the treatment for pregnant women with hypertension?"
+```
+
+### Run evaluation
+```
+# Evaluate LLM
+make evaluate-llm
+
+# Evaluate RAG system
+evaluate-rag
+
+# Evaluate Chatbot on monitoring dataset
+evaluate-llm-monitoring
+```
+
 ## Integration with AWS
 ### Data crawler
 - Save the data/links.txt in a S3 bucket
