@@ -31,7 +31,7 @@ if __name__ == "__main__":
     query = args.query
 
     response = inference_endpoint.generate(
-        query=query, enable_rag=True, sample_for_evaluation=False
+        query=query, enable_rag=True, sample_for_evaluation=True
     )
 
     logger.info("=" * 50)
