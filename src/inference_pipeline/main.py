@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 
@@ -14,12 +15,20 @@ logger = logger_utils.get_logger(__name__)
 
 
 if __name__ == "__main__":
+    # Add argument parsing
+    parser = argparse.ArgumentParser(description="Inference pipeline for the chatbot.")
+    parser.add_argument(
+        "--query",
+        type=str,
+        default="how to treat a pregnant woman with a hypertension?",
+        help="The query to send to the chatbot.",
+    )
+    args = parser.parse_args()
+
     login(token=settings.HUGGINGFACE_ACCESS_TOKEN)
     inference_endpoint = Chatbot(mock=False)
 
-    query = """
-    how to treat a pregnant woman with a hypertension?
-    """
+    query = args.query
 
     response = inference_endpoint.generate(
         query=query, enable_rag=True, sample_for_evaluation=False

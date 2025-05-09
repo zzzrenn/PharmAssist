@@ -21,13 +21,11 @@ class AppSettings(BaseSettings):
     RABBITMQ_PORT: int = 5672
 
     # QdrantDB config
-    QDRANT_CLOUD_URL: str = "https://c8820847-221d-42b6-9a77-75afc147c89b.eu-central-1-0.aws.cloud.qdrant.io"
+    QDRANT_CLOUD_URL: str
     QDRANT_DATABASE_HOST: str = "qdrant"
     QDRANT_DATABASE_PORT: int = 6333
     USE_QDRANT_CLOUD: bool = True
-    QDRANT_APIKEY: str | None = (
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.DEOG7SVnS9BJ6Aar4E7847jPnWLLL108O6jGnaoptDg"
-    )
+    QDRANT_APIKEY: str | None
 
     # Embeddings config
     EMBEDDING_MODEL_ID: str = "BAAI/bge-small-en-v1.5"
@@ -60,9 +58,17 @@ class AppSettings(BaseSettings):
     # Model config
     MODEL_DEVICE: str = "cuda"
     MODEL_ID: str = "Qwen/Qwen2.5-1.5B-Instruct"
+    # MODEL_ID: str = "meta-llama/Llama-3.1-8B-Instruct"
     MAX_INPUT_TOKENS: int = 1024  # Max length of input text.
     MAX_TOTAL_TOKENS: int = 2048  # Max length of the generation (including input text).
     MAX_BATCH_TOTAL_TOKENS: int = 2048  # Limits the number of tokens that can be processed in parallel during the generation.
+    DEPLOYMENT_ENDPOINT_NAME: str = "pharmassist"
+
+    # AWS Authentication
+    AWS_REGION: str = "eu-central-1"
+    AWS_ACCESS_KEY: str | None = None
+    AWS_SECRET_KEY: str | None = None
+    AWS_ARN_ROLE: str | None = None
 
 
 settings = AppSettings()

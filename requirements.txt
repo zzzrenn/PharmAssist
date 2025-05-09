@@ -23,3 +23,5 @@ langchain-openai
 comet-ml
 accelerate
 bitsandbytes
+
+sagemaker

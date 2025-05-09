@@ -20,6 +20,7 @@ repos:
           description: Checks for debugger imports and py37+ `breakpoint()` calls
         - id: check-merge-conflict
           description: Checks for files containing merge conflict strings
+        - id: detect-private-key
 
     - repo: https://github.com/astral-sh/ruff-pre-commit
       rev: v0.11.5

@@ -113,7 +113,7 @@ class Chatbot:
         if sample_for_evaluation is True:
             add_to_dataset_with_sampling(
                 item={"input": {"query": query}, "expected_output": answer},
-                dataset_name="LLMTwinMonitoringDataset",
+                dataset_name="PharmAssistMonitoringDataset",
             )
 
         return answer

@@ -8,11 +8,6 @@ ROOT_DIR = str(Path(__file__).parent.parent.parent)
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=ROOT_DIR, env_file_encoding="utf-8")
 
-    # # CometML config
-    # COMET_API_KEY: str | None = None
-    # COMET_WORKSPACE: str | None = None
-    # COMET_PROJECT: str = "llm-twin"
-
     # Embeddings config
     EMBEDDING_MODEL_PROVIDER: str = "huggingface"
     EMBEDDING_MODEL_ID: str = "BAAI/bge-small-en-v1.5"
