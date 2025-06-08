@@ -2,7 +2,9 @@ from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import (
     Batch,
     Distance,
+    Fusion,
     Modifier,
+    Prefetch,
     SparseVectorParams,
     VectorParams,
 )
@@ -67,12 +69,60 @@ class QdrantDatabaseConnector:
         query_filter: models.Filter | None = None,
         limit: int = 3,
     ) -> list:
-        return self._instance.search(
+        return self._instance.query_points(
             collection_name=collection_name,
-            query_vector=query_vector,
+            query=query_vector,
             query_filter=query_filter,
             limit=limit,
-        )
+        ).points
+
+    def hybrid_search_rrf(
+        self,
+        collection_name: str,
+        dense_vector: list[float],
+        sparse_vector: dict,
+        query_filter: models.Filter | None = None,
+        limit: int = 3,
+    ) -> list:
+        """
+        Perform hybrid search using both dense and sparse vectors with Reciprocal Rank Fusion (RRF).
+
+        Args:
+            collection_name: Name of the collection to search
+            dense_vector: Dense embedding vector
+            sparse_vector: Sparse vector (e.g., from BM25)
+            query_filter: Optional filter to apply
+            limit: Maximum number of results to return
+
+        Returns:
+            List of search results
+        """
+        # Create prefetch queries for each vector type
+        prefetch_queries = [
+            Prefetch(
+                query=dense_vector,
+                using="dense",
+                limit=limit,
+            )
+        ]
+
+        # Add sparse vector prefetch if provided
+        if sparse_vector:
+            prefetch_queries.append(
+                Prefetch(
+                    query=sparse_vector,
+                    using="sparse",
+                    limit=limit,
+                )
+            )
+
+        return self._instance.query_points(
+            collection_name=collection_name,
+            prefetch=prefetch_queries,
+            query=models.FusionQuery(fusion=Fusion.RRF),
+            query_filter=query_filter,
+            limit=limit,
+        ).points
 
     def scroll(self, collection_name: str, limit: int):
         return self._instance.scroll(collection_name=collection_name, limit=limit)

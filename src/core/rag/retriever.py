@@ -21,7 +21,7 @@ class VectorRetriever:
     Class for retrieving vectors from a Vector store in a RAG system using query expansion and Multitenancy search.
     """
 
-    def __init__(self, query: str) -> None:
+    def __init__(self, query: str, hybrid_search: bool = False) -> None:
         self._client = QdrantDatabaseConnector()
         self.query = query
         device = settings.EMBEDDING_MODEL_DEVICE
@@ -32,18 +32,34 @@ class VectorRetriever:
             )
         else:
             logger.info("Using CUDA device for embeddings.")
-        self._embedder = embedding_model_factory.create_embedding_model()
+        self._dense_embedder = embedding_model_factory.create_embedding_model()
+        self._sparse_embedder = (
+            embedding_model_factory.create_embedding_model(sparse=True)
+            if hybrid_search
+            else None
+        )
         self._query_expander = QueryExpansion()
         self._metadata_extractor = SelfQuery() if settings.ENABLE_SELF_QUERY else None
         self._reranker = Reranker() if settings.ENABLE_RERANKING else None
 
+        logger.info(
+            "Retriever initialized successfully.",
+            hybrid_search=hybrid_search,
+            self_query=settings.ENABLE_SELF_QUERY,
+        )
+
     def _search_single_query(self, generated_query: str, chapter_name: str, k: int):
         assert k > 1, "k should be greater than 1"
 
-        query_vector = self._embedder.embed(generated_query)
+        dense_query_vector = self._dense_embedder.embed(generated_query)
+        sparse_query_vector = (
+            self._sparse_embedder.embed(generated_query).as_object()
+            if self._sparse_embedder
+            else None
+        )
 
         vectors = [
-            self._client.search(
+            self._client.hybrid_search_rrf(
                 collection_name="vector_nice",
                 query_filter=models.Filter(
                     must=(
@@ -59,7 +75,8 @@ class VectorRetriever:
                         else None
                     )
                 ),
-                query_vector=query_vector,
+                dense_vector=dense_query_vector,
+                sparse_vector=sparse_query_vector,
                 limit=k,
             )
         ]

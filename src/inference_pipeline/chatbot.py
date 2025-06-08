@@ -78,7 +78,9 @@ class Chatbot:
         prompt_template_variables = {"question": query}
 
         if enable_rag is True:
-            retriever = VectorRetriever(query=query)
+            retriever = VectorRetriever(
+                query=query, hybrid_search=settings.ENABLE_SPARSE_EMBEDDING
+            )
             hits = retriever.retrieve_top_k(
                 k=settings.TOP_K, to_expand_to_n_queries=settings.EXPAND_N_QUERY
             )

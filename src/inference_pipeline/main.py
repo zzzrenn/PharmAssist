@@ -20,7 +20,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--query",
         type=str,
-        default="how to treat a pregnant woman with a hypertension?",
+        default="first line of treatment for pregnant woman with hypertension?",
         help="The query to send to the chatbot.",
     )
     args = parser.parse_args()

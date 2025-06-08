@@ -39,6 +39,7 @@ class AppSettings(BaseSettings):
     TOP_K: int = 5
     KEEP_TOP_K: int = 5
     EXPAND_N_QUERY: int = 5
+    ENABLE_SPARSE_EMBEDDING: bool = True
 
     # OpenAI config
     OPENAI_MODEL_ID: str = "gpt-4o-mini"
