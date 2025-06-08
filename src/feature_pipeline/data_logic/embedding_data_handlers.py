@@ -28,6 +28,7 @@ class NiceEmbeddingHandler(EmbeddingDataHandler):
             url=data_model.url,
             last_updated=data_model.last_updated,
             chunk_content=data_model.chunk_content,
-            embedded_content=embedd_text(data_model.chunk_content),
+            dense_embedded_content=embedd_text(data_model.chunk_content),
+            sparse_embedded_content=embedd_text(data_model.chunk_content, sparse=True),
             type=data_model.type,
         )

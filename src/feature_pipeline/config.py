@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     EMBEDDING_SIZE: int = 384
     EMBEDDING_MODEL_DEVICE: str = "cuda"
 
+    # BM25 Sparse Embeddings config (for FastEmbed BM25)
+    BM25_MODEL_ID: str = "Qdrant/bm25"
+
     # OpenAI
     OPENAI_MODEL_ID: str = "gpt-4o-mini"
     OPENAI_API_KEY: str | None = None
@@ -27,7 +30,7 @@ class Settings(BaseSettings):
     RABBITMQ_QUEUE_NAME: str = "default"
 
     # QdrantDB config
-    QDRANT_DATABASE_HOST: str = "localhost"  # or localhost if running outside Docker
+    QDRANT_DATABASE_HOST: str = "qdrant"  # or localhost if running outside Docker
     QDRANT_DATABASE_PORT: int = 6333
     USE_QDRANT_CLOUD: bool = True  # if True, fill in QDRANT_CLOUD_URL and QDRANT_APIKEY
     QDRANT_CLOUD_URL: str | None = None

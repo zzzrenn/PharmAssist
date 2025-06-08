@@ -15,12 +15,19 @@ class EmbeddingModelManager:
         return cls._instance
 
     def _initialize_model(self):
-        self._model = embedding_model_factory.create_embedding_model()
+        self._dense_model = embedding_model_factory.create_embedding_model()
+        self._sparse_model = embedding_model_factory.create_embedding_model(sparse=True)
 
-    def encode(self, text: str):
-        return self._model.embed(text)
+    def encode(self, text: str, sparse: bool = False):
+        if sparse:
+            if self._sparse_model:
+                return self._sparse_model.embed(text).as_object()
+            else:
+                return None
+        else:
+            return self._dense_model.embed(text)
 
 
-def embedd_text(text: str):
+def embedd_text(text: str, sparse: bool = False):
     model_manager = EmbeddingModelManager()
-    return model_manager.encode(text)
+    return model_manager.encode(text, sparse)

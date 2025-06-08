@@ -104,7 +104,7 @@ class QdrantVectorDataSink(StatelessSinkPartition):
 
     def write_batch(self, items: list[VectorDBDataModel]) -> None:
         payloads = [item.to_payload() for item in items]
-        ids, vectors, meta_data = zip(*payloads)
+        ids, dense_vectors, sparse_vectors, meta_data = zip(*payloads)
         collection_name = get_vector_collection(data_type=meta_data[0]["type"])
         match_id = meta_data[0]["id"]
 
@@ -131,7 +131,11 @@ class QdrantVectorDataSink(StatelessSinkPartition):
         # Insert new points
         self._client.write_data(
             collection_name=collection_name,
-            points=Batch(ids=ids, vectors=vectors, payloads=meta_data),
+            points=Batch(
+                ids=ids,
+                vectors={"dense": dense_vectors, "sparse": sparse_vectors},
+                payloads=meta_data,
+            ),
         )
 
         logger.info(

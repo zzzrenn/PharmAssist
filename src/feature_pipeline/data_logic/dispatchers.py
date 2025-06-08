@@ -116,7 +116,10 @@ class EmbeddingDispatcher:
         logger.info(
             "Chunk embedded successfully.",
             data_type=data_type,
-            embedding_len=len(embedded_chunk_model.embedded_content),
+            dense_embedding_len=len(embedded_chunk_model.dense_embedded_content),
+            sparse_embedding=True
+            if embedded_chunk_model.sparse_embedded_content
+            else False,
         )
 
         return embedded_chunk_model

@@ -34,6 +34,10 @@ class AppSettings(BaseSettings):
     EMBEDDING_SIZE: int = 384
     EMBEDDING_MODEL_DEVICE: str = "cuda"
 
+    # Sparse Embeddings config
+    SPARSE_EMBEDDING_MODEL_PROVIDER: str = "fastembed"
+    SPARSE_EMBEDDING_MODEL_ID: str = "Qdrant/bm25"
+
     # RAG config
     ENABLE_SELF_QUERY: bool = True
     ENABLE_RERANKING: bool = True

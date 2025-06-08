@@ -13,3 +13,4 @@ langchain
 langchain-openai
 sentence-transformers
 InstructorEmbedding
+fastembed

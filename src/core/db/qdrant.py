@@ -1,5 +1,11 @@
 from qdrant_client import QdrantClient, models
-from qdrant_client.http.models import Batch, Distance, VectorParams
+from qdrant_client.http.models import (
+    Batch,
+    Distance,
+    Modifier,
+    SparseVectorParams,
+    VectorParams,
+)
 
 import core.logger_utils as logger_utils
 from core.config import settings
@@ -34,9 +40,16 @@ class QdrantDatabaseConnector:
     def create_vector_collection(self, collection_name: str):
         self._instance.create_collection(
             collection_name=collection_name,
-            vectors_config=VectorParams(
-                size=settings.EMBEDDING_SIZE, distance=Distance.COSINE
-            ),
+            vectors_config={
+                "dense": VectorParams(
+                    size=settings.EMBEDDING_SIZE, distance=Distance.COSINE
+                )
+            },
+            sparse_vectors_config={
+                "sparse": SparseVectorParams(
+                    modifier=Modifier.IDF,  # Use IDF modifier for BM25
+                )
+            },
         )
 
     def write_data(self, collection_name: str, points: Batch):
