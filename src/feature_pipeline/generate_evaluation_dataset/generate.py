@@ -343,7 +343,7 @@ class EvaluationQuestionGenerator:
 
 def main():
     """Main function to generate evaluation datasets."""
-    generator = EvaluationQuestionGenerator(n_questions_per_content=5)
+    generator = EvaluationQuestionGenerator(n_questions_per_content=3)
 
     # Define collections to process
     collections = [
@@ -359,10 +359,8 @@ def main():
                 collection_name=collection_name,
                 batch_size=1,
                 filter_by_chapters=[
-                    "Overview",
                     "Recommendations",
                     "Recommendations for research",
-                    "Rationale and impact",
                     "Context",
                 ],
             )
