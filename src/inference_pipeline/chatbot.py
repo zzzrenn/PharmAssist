@@ -64,6 +64,12 @@ class Chatbot:
             )
             self.model.eval()  # Set to evaluation mode
         self.prompt_template_builder = InferenceTemplate()
+        self.retriever = VectorRetriever(
+            hybrid_search=settings.ENABLE_SPARSE_EMBEDDING,
+            self_query=settings.ENABLE_SELF_QUERY,
+            n_query_expansion=settings.EXPAND_N_QUERY,
+            rerank=settings.ENABLE_RERANKING,
+        )
 
     @opik.track(name="inference_pipeline.generate")
     def generate(
@@ -78,13 +84,10 @@ class Chatbot:
         prompt_template_variables = {"question": query}
 
         if enable_rag is True:
-            retriever = VectorRetriever(
-                query=query, hybrid_search=settings.ENABLE_SPARSE_EMBEDDING
+            hits = self.retriever.retrieve_top_k(query=query, k=settings.TOP_K)
+            context = self.retriever.rerank(
+                query=query, hits=hits, keep_top_k=settings.KEEP_TOP_K
             )
-            hits = retriever.retrieve_top_k(
-                k=settings.TOP_K, to_expand_to_n_queries=settings.EXPAND_N_QUERY
-            )
-            context = retriever.rerank(hits=hits, keep_top_k=settings.KEEP_TOP_K)
             prompt_template_variables["context"] = context
         else:
             context = None
