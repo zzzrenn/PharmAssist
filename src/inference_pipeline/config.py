@@ -34,11 +34,11 @@ class AppSettings(BaseSettings):
     EMBEDDING_MODEL_DEVICE: str = "cuda"
 
     # RAG config
-    ENABLE_SELF_QUERY: bool = True
+    ENABLE_SELF_QUERY: bool = False
     ENABLE_RERANKING: bool = True
     TOP_K: int = 5
     KEEP_TOP_K: int = 5
-    EXPAND_N_QUERY: int = 1
+    EXPAND_N_QUERY: int = 2
     ENABLE_SPARSE_EMBEDDING: bool = True
 
     # OpenAI config
@@ -64,6 +64,9 @@ class AppSettings(BaseSettings):
     MAX_TOTAL_TOKENS: int = 2048  # Max length of the generation (including input text).
     MAX_BATCH_TOTAL_TOKENS: int = 2048  # Limits the number of tokens that can be processed in parallel during the generation.
     DEPLOYMENT_ENDPOINT_NAME: str = "pharmassist"
+
+    # Chatbot config
+    CHATBOT_PROVIDER: str = "openai"
 
     # AWS Authentication
     AWS_REGION: str = "eu-central-1"

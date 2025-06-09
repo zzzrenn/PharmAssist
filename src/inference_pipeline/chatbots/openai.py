@@ -1,68 +1,35 @@
 import pprint
 
 import opik
-import torch
 from config import settings
 from langchain.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
 from opik import opik_context
+from opik.integrations.langchain import OpikTracer
 from prompt_templates import InferenceTemplate
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from utils import compute_num_tokens, truncate_text_to_max_tokens
 
 from core import logger_utils
 from core.opik_utils import add_to_dataset_with_sampling
 from core.rag.retriever import VectorRetriever
+from inference_pipeline.chatbots.chatbot_base import ChatbotBase
 
 logger = logger_utils.get_logger(__name__)
 
 
-class Chatbot:
+class ChatbotOpenAI(ChatbotBase):
     def __init__(self, mock: bool = False) -> None:
         self._mock = mock
         if not mock:
-            # Initialize model from Hugging Face using config
-            self.tokenizer = AutoTokenizer.from_pretrained(
-                settings.MODEL_ID, trust_remote_code=True
+            # Initialize OpenAI model using LangChain
+            self.model = ChatOpenAI(
+                model=settings.OPENAI_MODEL_ID,
+                api_key=settings.OPENAI_API_KEY,
+                temperature=0.7,
+                max_tokens=settings.MAX_TOTAL_TOKENS - settings.MAX_INPUT_TOKENS,
             )
-            # Set padding token if not already set
-            if self.tokenizer.pad_token is None:
-                self.tokenizer.pad_token = self.tokenizer.eos_token
+            logger.info(f"Initialized OpenAI model: {settings.OPENAI_MODEL_ID}")
 
-            device = settings.MODEL_DEVICE
-            if device.startswith("cuda") and not torch.cuda.is_available():
-                device = "cpu"
-                logger.warning(
-                    "CUDA device requested but not available. Falling back to CPU."
-                )
-            else:
-                logger.info("Using CUDA device for LLM.")
-
-            # Configure bitsandbytes quantization only for CUDA
-            if device.startswith("cuda"):
-                quantization_config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_compute_dtype=torch.bfloat16,
-                    bnb_4bit_use_double_quant=True,
-                )
-                model_kwargs = {
-                    "quantization_config": quantization_config,
-                    "device_map": device,
-                    "trust_remote_code": True,
-                }
-                logger.info("Using bitsandbytes quantization for LLM.")
-            else:
-                model_kwargs = {
-                    "device_map": device,
-                    "trust_remote_code": True,
-                    "torch_dtype": torch.float32,
-                }
-
-            # Load model
-            self.model = AutoModelForCausalLM.from_pretrained(
-                settings.MODEL_ID, **model_kwargs
-            )
-            self.model.eval()  # Set to evaluation mode
         self.prompt_template_builder = InferenceTemplate()
         self.retriever = VectorRetriever(
             hybrid_search=settings.ENABLE_SPARSE_EMBEDDING,
@@ -70,6 +37,9 @@ class Chatbot:
             n_query_expansion=settings.EXPAND_N_QUERY,
             rerank=settings.ENABLE_RERANKING,
         )
+
+        # Initialize Opik tracer for LangChain integration
+        self.opik_tracer = OpikTracer(tags=["openai_chatbot"])
 
     @opik.track(name="inference_pipeline.generate")
     def generate(
@@ -107,11 +77,11 @@ class Chatbot:
 
         num_answer_tokens = compute_num_tokens(answer)
         opik_context.update_current_trace(
-            tags=["rag"],
+            tags=["rag", "openai"],
             metadata={
                 "prompt_template": prompt_template.template,
                 "prompt_template_variables": prompt_template_variables,
-                "model_id": settings.MODEL_ID,
+                "model_id": settings.OPENAI_MODEL_ID,
                 "embedding_model_id": settings.EMBEDDING_MODEL_ID,
                 "input_tokens": input_num_tokens,
                 "answer_tokens": num_answer_tokens,
@@ -157,43 +127,33 @@ class Chatbot:
             logger.warning("Mocking LLM service call.")
             return "Mocked answer."
 
-        # Format messages according to Qwen's chat template
-        formatted_messages = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
-        )
+        try:
+            # Convert messages to LangChain format
+            from langchain.schema import HumanMessage, SystemMessage
 
-        # Tokenize the input without padding
-        inputs = self.tokenizer(
-            formatted_messages,
-            return_tensors="pt",
-            truncation=True,
-            max_length=settings.MAX_INPUT_TOKENS,
-        )
+            langchain_messages = []
+            for message in messages:
+                if message["role"] == "system":
+                    langchain_messages.append(SystemMessage(content=message["content"]))
+                elif message["role"] == "user":
+                    langchain_messages.append(HumanMessage(content=message["content"]))
 
-        # Move input tensors to the same device as the model
-        device = next(self.model.parameters()).device
-        inputs = {k: v.to(device) for k, v in inputs.items()}
-
-        # Generate response
-        with torch.no_grad():
-            outputs = self.model.generate(
-                inputs["input_ids"],
-                attention_mask=inputs["attention_mask"],
-                max_new_tokens=settings.MAX_TOTAL_TOKENS - settings.MAX_INPUT_TOKENS,
-                do_sample=True,
-                temperature=0.7,
-                top_p=0.95,
-                top_k=50,
-                pad_token_id=self.tokenizer.pad_token_id,
-                eos_token_id=self.tokenizer.eos_token_id,
-                repetition_penalty=1.1,
-                use_cache=True,  # Enable KV cache for faster generation
+            # Call OpenAI model with Opik tracing
+            response = self.model.invoke(
+                langchain_messages, config={"callbacks": [self.opik_tracer]}
             )
 
-        # Decode the response and remove the input prompt
-        answer = self.tokenizer.decode(
-            outputs[0, inputs["input_ids"].shape[1] :], skip_special_tokens=True
-        )
-        answer = answer.strip()
+            answer = response.content.strip()
+            logger.info("Successfully generated response using OpenAI model.")
 
-        return answer
+            return answer
+
+        except Exception as e:
+            logger.error(f"Error calling OpenAI service: {str(e)}")
+            raise e
+
+    def get_config(self) -> dict:
+        return {
+            "provider": "openai",
+            "model_id": settings.OPENAI_MODEL_ID,
+        }

@@ -5,7 +5,7 @@ import sys
 # Add the project root to path to resolve module imports
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from chatbot import Chatbot
+from chatbots import chatbot
 from huggingface_hub import login
 
 from core import logger_utils
@@ -20,18 +20,18 @@ if __name__ == "__main__":
     parser.add_argument(
         "--query",
         type=str,
-        default="first line of treatment for pregnant woman with hypertension?",
+        default="first treatment options for pregnant woman with hypertension?",
         help="The query to send to the chatbot.",
     )
     args = parser.parse_args()
 
     login(token=settings.HUGGINGFACE_ACCESS_TOKEN)
-    inference_endpoint = Chatbot(mock=False)
+    inference_endpoint = chatbot
 
     query = args.query
 
     response = inference_endpoint.generate(
-        query=query, enable_rag=True, sample_for_evaluation=True
+        query=query, enable_rag=True, sample_for_evaluation_rate=0.0
     )
 
     logger.info("=" * 50)

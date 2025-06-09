@@ -1,6 +1,6 @@
 import argparse
 
-from chatbot import Chatbot
+from chatbots import chatbot
 from config import settings
 from opik.evaluation import evaluate
 from opik.evaluation.metrics import Hallucination, LevenshteinRatio, Moderation
@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 class Evaluator:
     def __init__(self):
         """Initialize the evaluator with a chatbot instance."""
-        self.chatbot = Chatbot(mock=False)
+        self.chatbot = chatbot
 
     def evaluation_task(self, x: dict) -> dict:
         """Evaluation task that uses the stored chatbot instance."""
@@ -46,7 +46,8 @@ class Evaluator:
             exit(1)
 
         experiment_config = {
-            "model_id": settings.MODEL_ID,
+            **self.chatbot.get_config(),
+            "embedding_model_id": settings.EMBEDDING_MODEL_ID,
         }
         scoring_metrics = [
             LevenshteinRatio(),

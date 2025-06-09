@@ -1,6 +1,7 @@
 import argparse
 
 import opik
+from chatbots import chatbot
 from config import settings
 from opik.evaluation import evaluate
 from opik.evaluation.metrics import AnswerRelevance, Hallucination, Moderation
@@ -9,7 +10,7 @@ from core.logger_utils import get_logger
 
 
 class MonitoringEvaluator:
-    def __init__(self, chatbot=None):
+    def __init__(self):
         """Initialize the MonitoringEvaluator with a chatbot instance.
 
         Args:
@@ -45,7 +46,14 @@ class MonitoringEvaluator:
         dataset = self.get_dataset(dataset_name)
 
         experiment_config = {
-            "model_id": settings.MODEL_ID,
+            **self.chatbot.get_config(),
+            "embedding_model_id": settings.EMBEDDING_MODEL_ID,
+            "hybrid_search": settings.ENABLE_SPARSE_EMBEDDING,
+            "self_query": settings.ENABLE_SELF_QUERY,
+            "expand_n_query": settings.EXPAND_N_QUERY,
+            "top_k": settings.TOP_K,
+            "keep_top_k": settings.KEEP_TOP_K,
+            "rerank": settings.ENABLE_RERANKING,
         }
 
         scoring_metrics = [
