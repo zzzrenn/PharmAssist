@@ -11,7 +11,7 @@ class BasePromptTemplate(ABC, BaseModel):
 
 
 class QueryExpansionTemplate(BasePromptTemplate):
-    prompt: str = """You are an AI language model assistant. Your task is to generate {to_expand_to_n}
+    prompt: str = """You are an AI language model assistant. Your task is to generate exactly {to_expand_to_n}
     different versions of the given user question to retrieve relevant documents from a vector
     database. By generating multiple perspectives on the user question, your goal is to help
     the user overcome some of the limitations of the distance-based similarity search.
