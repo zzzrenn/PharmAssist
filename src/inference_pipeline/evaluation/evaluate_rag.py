@@ -12,31 +12,58 @@ from opik.evaluation.metrics import (
 from core.logger_utils import get_logger
 from core.opik_utils import create_dataset_from_artifacts
 
-# settings.patch_localhost()
-
 logger = get_logger(__name__)
-# logger.warning(
-#     "Patched settings to work with 'localhost' URLs. \
-#     Remove the 'settings.patch_localhost()' call from above when deploying or running inside Docker."
-# )
 
 
-def evaluation_task(x: dict) -> dict:
-    inference_pipeline = Chatbot(mock=False)
-    result = inference_pipeline.generate(
-        query=x["instruction"],
-        enable_rag=True,
-    )
-    answer = result["answer"]
-    context = result["context"]
+class RAGEvaluator:
+    def __init__(self):
+        self.chatbot = Chatbot(mock=False)
 
-    return {
-        "input": x["instruction"],
-        "output": answer,
-        "context": context,
-        "expected_output": x["content"],
-        "reference": x["content"],
-    }
+    def evaluation_task(self, x: dict) -> dict:
+        result = self.chatbot.generate(
+            query=x["query"],
+            enable_rag=True,
+        )
+        answer = result["answer"]
+        context = result["context"]
+
+        return {
+            "input": x["query"],
+            "output": answer,
+            "context": context,
+            "expected_output": x["gt_answer"],
+            "reference": x["gt_answer"],
+        }
+
+    def evaluate_dataset(self, dataset_name: str) -> None:
+        logger.info(f"Evaluating Opik dataset: '{dataset_name}'")
+
+        dataset = create_dataset_from_artifacts(
+            dataset_name=dataset_name,
+            artifact_names=[
+                "cleaned_nice-evaluation-dataset",
+            ],
+        )
+        if dataset is None:
+            logger.error("Dataset can't be created. Exiting.")
+            exit(1)
+
+        experiment_config = {
+            "model_id": settings.MODEL_ID,
+            "embedding_model_id": settings.EMBEDDING_MODEL_ID,
+        }
+        scoring_metrics = [
+            Hallucination(model="gpt-4o-mini"),
+            ContextRecall(model="gpt-4o-mini"),
+            ContextPrecision(model="gpt-4o-mini"),
+        ]
+        evaluate(
+            dataset=dataset,
+            task=self.evaluation_task,
+            scoring_metrics=scoring_metrics,
+            experiment_config=experiment_config,
+            task_threads=1,
+        )
 
 
 def main() -> None:
@@ -49,37 +76,10 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-
     dataset_name = args.dataset_name
 
-    logger.info(f"Evaluating Opik dataset: '{dataset_name}'")
-
-    dataset = create_dataset_from_artifacts(
-        dataset_name=dataset_name,
-        artifact_names=[
-            "NICE_Guideline-instruct-dataset",
-        ],
-    )
-    if dataset is None:
-        logger.error("Dataset can't be created. Exiting.")
-        exit(1)
-
-    experiment_config = {
-        "model_id": settings.MODEL_ID,
-        "embedding_model_id": settings.EMBEDDING_MODEL_ID,
-    }
-    scoring_metrics = [
-        Hallucination(),
-        ContextRecall(),
-        ContextPrecision(),
-    ]
-    evaluate(
-        dataset=dataset,
-        task=evaluation_task,
-        scoring_metrics=scoring_metrics,
-        experiment_config=experiment_config,
-        task_threads=1,
-    )
+    evaluator = RAGEvaluator()
+    evaluator.evaluate_dataset(dataset_name)
 
 
 if __name__ == "__main__":

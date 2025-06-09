@@ -17,6 +17,7 @@ numpy
 langchain
 sentence-transformers
 InstructorEmbedding
+fastembed
 
 opik
 langchain-openai

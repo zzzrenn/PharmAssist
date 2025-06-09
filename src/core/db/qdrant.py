@@ -124,8 +124,15 @@ class QdrantDatabaseConnector:
             limit=limit,
         ).points
 
-    def scroll(self, collection_name: str, limit: int):
-        return self._instance.scroll(collection_name=collection_name, limit=limit)
+    def scroll(
+        self,
+        collection_name: str,
+        limit: int,
+        scroll_filter: models.Filter | None = None,
+    ):
+        return self._instance.scroll(
+            collection_name=collection_name, limit=limit, scroll_filter=scroll_filter
+        )
 
     def close(self):
         if self._instance:

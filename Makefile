@@ -3,7 +3,7 @@
 # ======================================
 
 local-start: # Build and start your local Docker infrastructure.
-	docker compose -f docker-compose.yml up --build
+	docker compose -f docker-compose.yml up --build -d
 
 local-stop: # Stop your local Docker infrastructure.
 	docker compose -f docker-compose.yml down --remove-orphans
@@ -55,6 +55,8 @@ call-inference-pipeline: # Call the inference pipeline client
 # ======================================
 # ---------- Evaluation models ---------
 # ======================================
+generate-evaluation-dataset: # Generate an evaluation dataset for the RAG model
+	cd src/feature_pipeline && python -m generate_evaluation_dataset.generate
 
 evaluate-llm: # Run evaluation tests on the LLM model's performance
 	cd src/inference_pipeline && python -m evaluation.evaluate

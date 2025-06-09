@@ -7,15 +7,59 @@ from opik.evaluation.metrics import AnswerRelevance, Hallucination, Moderation
 
 from core.logger_utils import get_logger
 
-logger = get_logger(__name__)
 
+class MonitoringEvaluator:
+    def __init__(self, chatbot=None):
+        """Initialize the MonitoringEvaluator with a chatbot instance.
 
-def evaluation_task(x: dict) -> dict:
-    return {
-        "input": x["input"]["query"],
-        "context": x["expected_output"]["context"],
-        "output": x["expected_output"]["answer"],
-    }
+        Args:
+            chatbot: The chatbot/RAG system to be evaluated
+        """
+        self.logger = get_logger(__name__)
+        self.chatbot = chatbot
+        self.client = opik.Opik()
+
+    def evaluation_task(self, x: dict) -> dict:
+        """Transform dataset item for evaluation."""
+        return {
+            "input": x["input"]["query"],
+            "context": x["expected_output"]["context"],
+            "output": x["expected_output"]["answer"],
+        }
+
+    def get_dataset(self, dataset_name: str):
+        """Retrieve dataset from Opik."""
+        try:
+            dataset = self.client.get_dataset(dataset_name)
+            return dataset
+        except Exception:
+            self.logger.error(
+                f"Monitoring dataset '{dataset_name}' not found in Opik. Exiting."
+            )
+            exit(1)
+
+    def run_evaluation(self, dataset_name: str = "PharmAssistMonitoringDataset"):
+        """Run the evaluation on the specified dataset."""
+        self.logger.info(f"Evaluating Opik dataset: '{dataset_name}'")
+
+        dataset = self.get_dataset(dataset_name)
+
+        experiment_config = {
+            "model_id": settings.MODEL_ID,
+        }
+
+        scoring_metrics = [
+            Hallucination(model="gpt-4o-mini"),
+            Moderation(model="gpt-4o-mini"),
+            AnswerRelevance(model="gpt-4o-mini"),
+        ]
+        evaluate(
+            dataset=dataset,
+            task=self.evaluation_task,
+            scoring_metrics=scoring_metrics,
+            experiment_config=experiment_config,
+            task_threads=1,
+        )
 
 
 def main() -> None:
@@ -31,29 +75,11 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    dataset_name = args.dataset_name
+    # Initialize evaluator (chatbot can be passed here when available)
+    evaluator = MonitoringEvaluator(chatbot=None)
 
-    logger.info(f"Evaluating Opik dataset: '{dataset_name}'")
-
-    client = opik.Opik()
-    try:
-        dataset = client.get_dataset(dataset_name)
-    except Exception:
-        logger.error(f"Monitoring dataset '{dataset_name}' not found in Opik. Exiting.")
-        exit(1)
-
-    experiment_config = {
-        "model_id": settings.MODEL_ID,
-    }
-
-    scoring_metrics = [Hallucination(), Moderation(), AnswerRelevance()]
-    evaluate(
-        dataset=dataset,
-        task=evaluation_task,
-        scoring_metrics=scoring_metrics,
-        experiment_config=experiment_config,
-        task_threads=1,
-    )
+    # Run evaluation
+    evaluator.run_evaluation(dataset_name=args.dataset_name)
 
 
 if __name__ == "__main__":

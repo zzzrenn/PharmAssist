@@ -76,8 +76,13 @@ class Chatbot:
         self,
         query: str,
         enable_rag: bool = False,
-        sample_for_evaluation: bool = False,
+        sample_for_evaluation_rate: float = 0.0,
+        dataset_name: str = "PharmAssistMonitoringDataset",
     ) -> dict:
+        assert 0 <= sample_for_evaluation_rate <= 1, (
+            "Sample rate must be between 0 and 1"
+        )
+
         system_prompt, prompt_template = self.prompt_template_builder.create_template(
             enable_rag=enable_rag
         )
@@ -115,10 +120,11 @@ class Chatbot:
         )
 
         answer = {"answer": answer, "context": context}
-        if sample_for_evaluation is True:
+        if sample_for_evaluation_rate:
             add_to_dataset_with_sampling(
                 item={"input": {"query": query}, "expected_output": answer},
-                dataset_name="PharmAssistMonitoringDataset",
+                dataset_name=dataset_name,
+                sample_rate=sample_for_evaluation_rate,
             )
 
         return answer

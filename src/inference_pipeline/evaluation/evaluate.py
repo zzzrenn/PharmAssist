@@ -11,20 +11,55 @@ from core.opik_utils import create_dataset_from_artifacts
 logger = get_logger(__name__)
 
 
-def evaluation_task(x: dict) -> dict:
-    inference_pipeline = Chatbot(mock=False)
-    result = inference_pipeline.generate(
-        query=x["instruction"],
-        enable_rag=False,
-    )
-    answer = result["answer"]
+class Evaluator:
+    def __init__(self):
+        """Initialize the evaluator with a chatbot instance."""
+        self.chatbot = Chatbot(mock=False)
 
-    return {
-        "input": x["instruction"],
-        "output": answer,
-        "expected_output": x["content"],
-        "reference": x["content"],
-    }
+    def evaluation_task(self, x: dict) -> dict:
+        """Evaluation task that uses the stored chatbot instance."""
+        result = self.chatbot.generate(
+            query=x["instruction"],
+            enable_rag=False,
+        )
+        answer = result["answer"]
+
+        return {
+            "input": x["instruction"],
+            "output": answer,
+            "expected_output": x["content"],
+            "reference": x["content"],
+        }
+
+    def run_evaluation(self, dataset_name: str = "PharmAssistTestDataset") -> None:
+        """Run the evaluation on the specified dataset."""
+        logger.info(f"Evaluating Opik dataset: '{dataset_name}'")
+
+        dataset = create_dataset_from_artifacts(
+            dataset_name=dataset_name,
+            artifact_names=[
+                "NICE_Guideline-instruct-dataset",
+            ],
+        )
+        if dataset is None:
+            logger.error("Dataset can't be created. Exiting.")
+            exit(1)
+
+        experiment_config = {
+            "model_id": settings.MODEL_ID,
+        }
+        scoring_metrics = [
+            LevenshteinRatio(),
+            Hallucination(model="gpt-4o-mini"),
+            Moderation(model="gpt-4o-mini"),
+        ]
+        evaluate(
+            dataset=dataset,
+            task=self.evaluation_task,
+            scoring_metrics=scoring_metrics,
+            experiment_config=experiment_config,
+            task_threads=1,
+        )
 
 
 def main() -> None:
@@ -38,35 +73,8 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    dataset_name = args.dataset_name
-
-    logger.info(f"Evaluating Opik dataset: '{dataset_name}'")
-
-    dataset = create_dataset_from_artifacts(
-        dataset_name=dataset_name,
-        artifact_names=[
-            "NICE_Guideline-instruct-dataset",
-        ],
-    )
-    if dataset is None:
-        logger.error("Dataset can't be created. Exiting.")
-        exit(1)
-
-    experiment_config = {
-        "model_id": settings.MODEL_ID,
-    }
-    scoring_metrics = [
-        LevenshteinRatio(),
-        Hallucination(),
-        Moderation(),
-    ]
-    evaluate(
-        dataset=dataset,
-        task=evaluation_task,
-        scoring_metrics=scoring_metrics,
-        experiment_config=experiment_config,
-        task_threads=1,
-    )
+    evaluator = Evaluator()
+    evaluator.run_evaluation(dataset_name=args.dataset_name)
 
 
 if __name__ == "__main__":

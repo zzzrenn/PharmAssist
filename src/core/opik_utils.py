@@ -84,7 +84,7 @@ def create_dataset_from_artifacts(
 
                 continue
 
-            testing_artifact_file = list(artifact_dir.glob("*_testing.json"))
+            testing_artifact_file = list(artifact_dir.glob("*.json"))
             assert len(testing_artifact_file) == 1, (
                 "Expected exactly one testing artifact file."
             )
@@ -125,8 +125,10 @@ def create_dataset(name: str, description: str, items: list[dict]) -> opik.Datas
     return dataset
 
 
-def add_to_dataset_with_sampling(item: dict, dataset_name: str) -> bool:
-    if "1" in random.choices(["0", "1"], weights=[0.3, 0.7]):
+def add_to_dataset_with_sampling(
+    item: dict, dataset_name: str, sample_rate: float = 0.0
+) -> bool:
+    if "1" in random.choices(["0", "1"], weights=[1 - sample_rate, sample_rate]):
         client = opik.Opik()
         dataset = client.get_or_create_dataset(name=dataset_name)
         dataset.insert([item])
